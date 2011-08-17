@@ -4,9 +4,11 @@
     <title>My Todo List</title>
     <script src="../vendor/jquery.js" type="text/javascript"></script>
     <script src="../glue.js" type="text/javascript"></script>
+    <script src="../objectController.js" type="text/javascript"></script>
+    <script src="../arrayController.js" type="text/javascript"></script>
     <script>
       $(function(){
-        var tasksController   = new CollectionController()
+        var tasksController   = new ArrayController()
         ,   $taskCountElement = $("#toDoCount")
         ,   $taskListElement  = $("#toDoList")
         ,   $toDoForm         = $("#toDoForm")
@@ -29,12 +31,13 @@
           var task = new ObjectController(taskData);
           var $tsk = $("<div><input type='checkbox'>"+task.get('task')+"</div>")
             .bind("change", function(e){
-              task.set({done: ( $(this).find("input").is(":checked") ) });
+              task.set("done", $(this).find("input").is(":checked") );
             })
           ;
 
-          task.addObserver($tsk, "done", function(meta){
-            if(meta.object.get("done")){
+          task.addObserver($tsk, "done", function(msg){
+            console.log( msg );
+            if(msg.object.get("done")){
               $(this).css({"text-decoration": "line-through"});
             } else {
               $(this).css({"text-decoration": "none"});
