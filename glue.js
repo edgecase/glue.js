@@ -44,14 +44,24 @@ Glue.prototype.addObserver= function(){
   if( this.isFunc(keyPath) ){
     hollaback = keyPath;
     keyPath   = this.anyKeyPath;
+  } else if( keyPath.match(/\,/gi) ){
+    kps = keyPath.replace(/\s/gi,"").split(",")
+    for(var i =0; i < kps.length; i++){
+      this.listeners.push({
+        "observedObject": observedObject,
+        "target":         target,
+        "keyPath":        kps[i],
+        "hollaback":      hollaback,
+      });
+    }
+  } else {
+    this.listeners.push({
+      "observedObject": observedObject,
+      "target":         target,
+      "keyPath":        keyPath,
+      "hollaback":      hollaback,
+    });
   }
-
-  this.listeners.push({
-    "observedObject": observedObject,
-    "target":         target,
-    "keyPath":        keyPath,
-    "hollaback":      hollaback,
-  });
   return this;
 };
 

@@ -7,6 +7,12 @@ var ContactInfoWithType = function(info) {
 var Contact = function() {
   this.firstname = "";
   this.lastname  = "";
+  this.family = {
+    tree:{
+      mother: "Sue",
+      father: "Bob"
+    }
+  };
   this.emails = []
   this.phones = [];
 };
