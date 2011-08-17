@@ -19,26 +19,50 @@
 //       must establish those observers independently of the
 //       collection in which they are added.
 
-
-
 var ObjectController = function(concreteObjectReference) {
   this.boundObject = concreteObjectReference;
   Glue.call(this)
 }
 ObjectController.prototype = Glue.prototype;
 
+ObjectController.prototype.resolveKeyPath = function(keyPath, baseObject, setterArgs){
+
+  var components = keyPath.split(".");
+  var newBaseObject;
+
+  var currentKeyPath = components.shift();
+  var possibleValue = baseObject[currentKeyPath];
+  if( this.isNothing(possibleValue) ){ return ; }
+
+  if( this.isFunc(possibleValue) ){
+    newBaseObject = possibleValue.call(baseObject);
+  } else {
+    newBaseObject = possibleValue;
+  }
+
+  if( components.length > 0 ){
+    return this.resolveKeyPath(components.join("."), newBaseObject, setterArgs);
+  } else {
+    if( !this.isNothing(setterArgs) ){
+      console.log(setterArgs);
+      newBaseObject[currentKeyPath] = setterArgs;
+    }
+    return newBaseObject;
+  }
+};
+
 ObjectController.prototype.set = function(keyPath, newValue){
   var old = this.get(keyPath);
-  this.boundObject[keyPath] = newValue;
+  var newVal = this.resolveKeyPath(keyPath, this.boundObject, newValue);
   this.broadcast.call(this, keyPath, {
     "keyPath" : keyPath,
     "object"  : this,
     "oldValue": old,
-    "newValue": newValue
+    "newValue": newVal
   });
   return this;
 };
 
 ObjectController.prototype.get = function(key){
-  return this.boundObject[key];
+  return this.resolveKeyPath(key, this.boundObject);
 };

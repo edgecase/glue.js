@@ -36,7 +36,6 @@
           ;
 
           task.addObserver($tsk, "done", function(msg){
-            console.log( msg );
             if(msg.object.get("done")){
               $(this).css({"text-decoration": "line-through"});
             } else {
