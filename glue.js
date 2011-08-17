@@ -1,8 +1,14 @@
 // object type challenges lovingly inspired by _.js
 
 function Glue(){
-  var self = this;
+  var self = this
+  ,   anyKeyPath = "*"
+  ;
   self.listeners= [];
+
+  self.isObservable = function(o){
+    return (o.addObserver && o.removeObserver && o.broadcast);
+  }
 
   var isFunc = function(o){
     return !!( o && o.constructor && o.call && o.apply );
@@ -34,7 +40,7 @@ function Glue(){
 
     if( isFunc(keyPath) ){
       hollaback = keyPath;
-      keyPath   = "*";
+      keyPath   = anyKeyPath;
     }
 
     self.listeners.push({
@@ -63,10 +69,10 @@ function Glue(){
   self.broadcast= function(keyPath, payload){
     for(var i=0 ; i < self.listeners.length ; i++){
       var listener = self.listeners[i];
-      console.log( listener.observedObject )
-      if(listener.observedObject !== this) continue;
-      if(keyPath === "*" || keyPath === listener.keyPath) {
-        listener.hollaback.call(listener.target, payload);
+      if( isArray(listener.observedObject) || (listener.observedObject === this) ) {
+        if( listener.keyPath === anyKeyPath || keyPath === listener.keyPath ) {
+          listener.hollaback.call(listener.target, payload);
+        }
       }
     }
     return self;
@@ -75,6 +81,70 @@ function Glue(){
   //allow method chaining madness.
   return self;
 };
+
+
+// ObjectController
+// Leon Gersing
+//
+// The ObjectController observes a javascript object and
+// broadcasts listeners to changes that take place on them.
+//
+// var oc = new ObjectController(target, [keyPath], hollaback);
+//
+// target:  The object that is listening to target object for changes.
+// keyPath: Any known property that can be set via a
+//          standard property setter can be observed.
+// hollaback: The function that should be invoked when a message is
+//            sent to the observing objects.
+//
+// chainable: true
+//
+// NOTE: it does not delegate model events to it's listners.
+//       In order to Observe events on individual objects, you
+//       must establish those observers independently of the
+//       collection in which they are added.
+
+function ObjectController(){
+  var self = this;
+  self.bindTo = function(objectReference){
+    self.boundObject = objectReference;
+  };
+
+  self.set = function(){
+    if(arguments.length == 1){
+      var obj = arguments[0];
+      if(obj !== Object(obj)) return;
+      for(var key in obj){
+        internalSet(key, obj[key]);
+      }
+    } else if (arguments.length == 2){
+      internalSet(arguments[0], arguments[1]);
+    }
+    return self;
+  };
+
+  self.get = function(key){
+    return self.boundObject[key];
+  };
+
+  // private methods
+  var internalSet = function(k,v){
+    var old = self.boundObject[k];
+    self.boundObject[k] = v;
+    self.broadcast.call(self.boundObject, k, {
+      "keyPath" : k,
+      "object"  : self,
+      "oldValue": old,
+      "newValue": v
+    });
+  };
+
+  // bound property initializer
+  // This is a shortcut for new ObjectController().bindTo({});
+  self.bindTo(arguments[0]);
+  return self;
+};
+
 
 // CollectionController
 // Leon Gersing
@@ -96,6 +166,9 @@ function CollectionController(){
   };
 
   self.add = function(item){
+    if ( item === Object(item) && !self.isObservable(item) ){
+      item = new ObjectController(item);
+    };
     self.boundObject.push(item);
     self.broadcast.call(self.boundObject, "add", {
       "change":"add",
@@ -154,47 +227,6 @@ function CollectionController(){
   //       change it to something completely differnt.
   //       Doing so, does not notify the observers of the change and
   //       therefore may have odd side-effects.
-  self.bindTo(arguments[0]);
-  return self;
-};
-
-function ObjectController(){
-  var self = this;
-  self.bindTo = function(objectReference){
-    self.boundObject = objectReference;
-  };
-
-  self.set = function(){
-    if(arguments.length == 1){
-      var obj = arguments[0];
-      if(obj !== Object(obj)) return;
-      for(var key in obj){
-        internalSet(key, obj[key]);
-      }
-    } else if (arguments.length == 2){
-      internalSet(arguments[0], arguments[1]);
-    }
-    return self;
-  };
-
-  self.get = function(key){
-    return self.boundObject[key];
-  };
-
-  // private methods
-  var internalSet = function(k,v){
-    var old = self.boundObject[k];
-    self.boundObject[k] = v;
-    self.broadcast.call(self.boundObject, k, {
-      "keyPath" : k,
-      "object"  : self,
-      "oldValue": old,
-      "newValue": v
-    });
-  };
-
-  // bound property initializer
-  // This is a shortcut for new ObjectController().bindTo({});
   self.bindTo(arguments[0]);
   return self;
 };

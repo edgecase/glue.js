@@ -12,8 +12,8 @@
         ,   $toDoForm         = $("#toDoForm")
         ;
 
-        tasksController.addObserver($taskCountElement, function(meta){
-          $(this).html(meta.currentCount.toString() + " tasks");
+        tasksController.addObserver($taskCountElement, function(msg){
+          $(this).html(msg.currentCount.toString() + " tasks");
         });
 
         $toDoForm.submit( function(evt){
@@ -27,12 +27,11 @@
           // End simulation- taskData is now a 'json' obj
 
           var task = new ObjectController(taskData);
-          var $tsk =
-          $("<div><input type='checkbox'>"+task.get('task')+"</div>")
-          .bind("change", function(e){
-            var isChecked = $(this).find("input").is(":checked");
-            task.set({done: isChecked });
-          });
+          var $tsk = $("<div><input type='checkbox'>"+task.get('task')+"</div>")
+            .bind("change", function(e){
+              task.set({done: ( $(this).find("input").is(":checked") ) });
+            })
+          ;
 
           task.addObserver($tsk, "done", function(meta){
             if(meta.object.get("done")){
