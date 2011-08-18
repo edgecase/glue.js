@@ -43,22 +43,30 @@ An ObjectController is responsible for managing the state of particular object.
 Receivers register themselves with the ObjectController and will be notified 
 when the object's state modified.
 
-#### new ObjectController(obj)
+```
+new ObjectController(obj)
+```
 
 Creates a new ObjectController. `obj` can be anything -- a DOM elememt, a 
 jQuery object, a Backbone model, a vanilla JS object, etc.
 
-#### #set(key, val)
+```
+#set(key, val)
+```
 
 Set a property on the source object. `key` uses dot notation to dive into the 
 object graph.
 
-#### #get(key)
+```
+#get(key)
+```
 
 Get a property from the source object. `key` uses dot notation to dive into the 
 object graph.
 
-#### #addObserver(receiver, key, callback)
+```
+#addObserver(receiver, key, callback)
+```
 
 Will notify `receiver` when `key` is modified on the source object. `key` uses 
 dot notation to dive into the object graph. `receiver` can be any JS object.  
@@ -70,16 +78,22 @@ dot notation to dive into the object graph. `receiver` can be any JS object.
 ArrayControllers are just collections of ObjectControllers. They are useful 
 when a receiver wants to know when any object in a collection is modified.
 
-#### new ArrayController()
+```
+new ArrayController()
+```
 
 Creates a new ArrayController.
 
-#### #add(objectController)
+```
+#add(objectController)
+```
 
 `objectController` should be an ObjectController instance. It is added to the 
 collection.
 
-#### #addObserver(receiver, key, callback)
+```
+#addObserver(receiver, key, callback)
+```
 
 Will notify `receiver` when `key` is modified on any of the source objects.  
 `key` uses dot notation to dive into the object graph. `receiver` can be any JS 
@@ -90,18 +104,26 @@ object.  `callback` is passed a Message object.
 
 Message objects are passed to the callback of an observer.
 
-#### #keyPath
+```
+#keyPath
+```
 
 The keyPath of the modified property.
 
-#### #object
+```
+#object
+```
 
 The ObjectController or ArrayController that is invoking the callback.
 
-#### #oldValue
+```
+#oldValue
+```
 
 The previous value of the modified property.
 
-#### #newValue
+```
+#newValue
+```
 
 The new value of the modified property.
