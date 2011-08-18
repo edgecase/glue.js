@@ -47,7 +47,7 @@ when the object's state modified.
 new ObjectController(obj)
 ```
 
-Creates a new ObjectController. `obj` can be anything -- a DOM elememt, a 
+Creates a new ObjectController. `obj` can be anything -- a DOM element, a 
 jQuery object, a Backbone model, a vanilla JS object, etc.
 
 ```
