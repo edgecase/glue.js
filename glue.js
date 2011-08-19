@@ -1,4 +1,35 @@
-// object type challenges lovingly inspired by _.js
+// Production steps of ECMA-262, Edition 5, 15.4.4.18
+// Reference: http://es5.github.com/#x15.4.4.18
+if ( !Array.prototype.forEach ) {
+  Array.prototype.forEach = function( callback, thisArg ) {
+    var T, k;
+
+    if ( this == null ) {
+      throw new TypeError( " this is null or not defined" );
+    }
+
+    var O = Object(this);
+    var len = O.length >>> 0;
+
+    if ( {}.toString.call(callback) != "[object Function]" ) {
+      throw new TypeError( callback + " is not a function" );
+    }
+
+    if ( thisArg ) T = thisArg;
+
+    k = 0;
+    while( k < len ) {
+      var kValue;
+      if ( k in O ) {
+        kValue = O[ Pk ];
+        callback.call( T, kValue, k, O );
+      }
+      k++;
+    }
+  };
+}
+
+String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); }
 
 function Glue(){
   this.anyKeyPath = "*"
@@ -53,6 +84,8 @@ Glue.prototype.addObserver= function(){
   var target = arguments[0];
   if( this.isNothing(target) ) throw "Target must be an object instance."
 
+  console.log("akp: "+this.anyKeyPath);
+  console.log("kp: "+ arguments[1]);
   var keyPath        = arguments[1] || this.anyKeyPath
   ,   hollaback      = arguments[2]
   ,   observedObject = this.boundObject
@@ -61,13 +94,15 @@ Glue.prototype.addObserver= function(){
   if( this.isFunc(keyPath) ){
     hollaback = keyPath;
     keyPath   = this.anyKeyPath;
-  } else if( keyPath.match(/\,/gi) ){
-    kps = keyPath.replace(/\s/gi,"").split(",")
+  }
+
+  if( keyPath.match(/\,/gi) ){
+    kps = keyPath.split(",")
     for(var i =0; i < kps.length; i++){
       this.listeners.push({
         "observedObject": observedObject,
         "target":         target,
-        "keyPath":        kps[i],
+        "keyPath":        kps[i].trim(),
         "hollaback":      hollaback,
       });
     }
@@ -75,7 +110,7 @@ Glue.prototype.addObserver= function(){
     this.listeners.push({
       "observedObject": observedObject,
       "target":         target,
-      "keyPath":        keyPath,
+      "keyPath":        keyPath.trim(),
       "hollaback":      hollaback,
     });
   }

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Todo List</title>
+    <script src="../vendor/jquery.js" type="text/javascript"></script>
+    <script src="../glue.js" type="text/javascript"></script>
+    <script src="../objectController.js" type="text/javascript"></script>
+    <script src="../arrayController.js" type="text/javascript"></script>
+    <script>
+    $(function(){
+      var people = [
+        { "name":"Leon", "age":30, "address":{ "state":"OH", "zip":32016 } },
+        { "name":"Felix", "age":20, "address":{ "state":"OH", "zip":32016 } },
+        { "name":"Justine", "age":20, "address":{ "state":"OH", "zip":32016 } },
+      ];
+      var jerry = { "name":"Jerry", "age":20, "address":{ "state":"OH", "zip":32016 } }
+
+      var countElement = document.getElementById("people-count");
+      var statusElement = document.getElementById("status");
+
+      var peopleController = new ArrayController(people);
+      var jerryController = new ObjectController(jerry)
+
+      peopleController.addObserver(countElement, "add", function(msg){
+        this.innerText= msg.currentCount;
+      });
+
+      jerryController.addObserver(statusElement, "name", function(msg){
+        this.innerText= "Jerry changed his name from "+msg.oldValue+" to "+ msg.newValue;
+      });
+
+      window.pc = peopleController;
+      window.jc = jerryController;
+      window.jerry = jerry;
+    });
+    </script>
+  </head>
+  <body>
+    <div>People: <span id="people-count"></span></div>
+    <div id="status"></div>
+  </body>
+</html>

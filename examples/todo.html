@@ -15,7 +15,7 @@
         ;
 
         tasksController.addObserver($taskCountElement, function(msg){
-          this.html(msg.object.count() + " tasks");
+          this.html(msg.currentCount+ " tasks");
         });
 
         $toDoForm.submit( function(evt){
