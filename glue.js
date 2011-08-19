@@ -54,7 +54,14 @@ Glue.prototype.setPropertyOnBoundObject = function(keyPath, newValue, obj) {
 };
 
 Glue.prototype.bindTo = function(objectReference){
+  var oldObject = this.boundObject
   this.boundObject = objectReference;
+  this.broadcast.call(this, "boundObject", {
+    "object"  : this,
+    "keyPath" : "boundObject",
+    "oldValue": oldObject,
+    "newValue": this.boundObject
+  });
 };
 
 Glue.prototype.isObservable = function(o){

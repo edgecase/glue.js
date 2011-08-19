@@ -12,8 +12,8 @@
 //       collection in which they are added.
 
 var ArrayController = function() {
-  this.boundObject = arguments[0] || [];
   Glue.call(this);
+  this.bindTo(arguments[0] || []);
 }
 ArrayController.prototype = Glue.prototype;
 

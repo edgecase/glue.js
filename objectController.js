@@ -19,9 +19,9 @@
 //       must establish those observers independently of the
 //       collection in which they are added.
 
-var ObjectController = function(concreteObjectReference) {
-  this.boundObject = concreteObjectReference;
+var ObjectController = function() {
   Glue.call(this)
+  this.bindTo(arguments[0] || {});
 }
 ObjectController.prototype = Glue.prototype;
 
