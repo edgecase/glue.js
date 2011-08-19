@@ -20,17 +20,19 @@
 //       collection in which they are added.
 
 var ObjectController = function() {
-  Glue.call(this)
-  this.bindTo(arguments[0] || {});
-}
+  Glue.call(this);
+  this.baseObject = {};
+  this.bindTo(arguments[0] || this.baseObject);
+};
+
 ObjectController.prototype = Glue.prototype;
 
 ObjectController.prototype.get = function(keyPath, obj) {
-  if( !obj ) obj = this.boundObject;
+  if( !obj ){ obj = this.boundObject; }
   var keyPaths = keyPath.split(/\./);
   var firstKeyPath = keyPaths[0];
   var currentValue = obj[firstKeyPath];
-  if( !currentValue) return;
+  if( !currentValue){ return; }
   if( keyPaths.length < 2 ){
     return currentValue;
   } else {

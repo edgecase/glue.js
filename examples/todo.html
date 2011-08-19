@@ -32,8 +32,7 @@
           var $tsk = $("<div><input type='checkbox'>"+task.get('task')+"</div>")
             .bind("change", function(e){
               task.set("done", $(this).find("input").is(":checked") );
-            })
-          ;
+              })          ;
 
           task.addObserver($tsk, "done", function(msg){
             this.css({ "text-decoration": (!!(msg.newValue) ? "line-through" : "none") });
@@ -47,6 +46,7 @@
 
         //bootstrap UX.
         $toDoForm.find("input").first().focus();
+        $(".reset").click(function(e){ tasksController.removeAllObservers(); });
       });
     </script>
   </head>
@@ -62,5 +62,6 @@
       <legend id="toDoCount">0 tasks</legend>
       <div id="toDoList"> </div>
     </fieldset>
+    <button class="reset">reset all</button>
   </body>
 </html>

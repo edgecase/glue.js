@@ -1,39 +1,9 @@
-// Production steps of ECMA-262, Edition 5, 15.4.4.18
-// Reference: http://es5.github.com/#x15.4.4.18
-if ( !Array.prototype.forEach ) {
-  Array.prototype.forEach = function( callback, thisArg ) {
-    var T, k;
-
-    if ( this == null ) {
-      throw new TypeError( " this is null or not defined" );
-    }
-
-    var O = Object(this);
-    var len = O.length >>> 0;
-
-    if ( {}.toString.call(callback) != "[object Function]" ) {
-      throw new TypeError( callback + " is not a function" );
-    }
-
-    if ( thisArg ) T = thisArg;
-
-    k = 0;
-    while( k < len ) {
-      var kValue;
-      if ( k in O ) {
-        kValue = O[ Pk ];
-        callback.call( T, kValue, k, O );
-      }
-      k++;
-    }
-  };
-}
-
-String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); }
+String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); };
 
 function Glue(){
-  this.anyKeyPath = "*"
-  this.listeners= [];
+  this.anyKeyPath = "*";
+  this.baseObject = {};
+  this.removeAllObservers();
 }
 
 // Recursively set properties based on keyPaths.
@@ -48,13 +18,13 @@ Glue.prototype.setPropertyOnBoundObject = function(keyPath, newValue, obj) {
   if( keyPaths.length < 2 || keyPaths.length > 0 ){
     obj[firstKeyPath] = newValue;
   } else {
-    keyPaths.shift()
+    keyPaths.shift();
     this.setPropertyOnBoundObject(keyPaths.join("."), newValue, obj[firstKeyPath] || {});
   }
 };
 
 Glue.prototype.bindTo = function(objectReference){
-  var oldObject = this.boundObject
+  var oldObject = this.boundObject;
   this.boundObject = objectReference;
   this.broadcast.call(this, "boundObject", {
     "object"  : this,
@@ -62,6 +32,15 @@ Glue.prototype.bindTo = function(objectReference){
     "oldValue": oldObject,
     "newValue": this.boundObject
   });
+};
+
+Glue.prototype.removeAllObservers = function(){
+  this.listeners = [];
+};
+
+Glue.prototype.reset = function(objectReference){
+  this.removeAllObservers();
+  this.bindTo(objectReference || this.baseObject);
 };
 
 Glue.prototype.isObservable = function(o){
@@ -73,11 +52,7 @@ Glue.prototype.isFunc = function(o){
 };
 
 Glue.prototype.isNothing = function(o){
-  return o === void 0 || o === null;
-};
-
-Glue.prototype.isObject = function(o){
-  return o === Object(o);
+  return o === undefined || o === null;
 };
 
 Glue.prototype.isArray = Array.isArray || function(o){
@@ -86,10 +61,10 @@ Glue.prototype.isArray = Array.isArray || function(o){
 
 // Adds a Listener to the controller.
 Glue.prototype.addObserver= function(){
-  if(arguments.length <= 1) throw "Not enough arguments to observe.";
+  if(arguments.length <= 1){ throw "Not enough arguments to observe."; }
 
   var target = arguments[0];
-  if( this.isNothing(target) ) throw "Target must be an object instance."
+  if( this.isNothing(target) ){ throw "Target must be an object instance."; }
 
   var keyPath        = arguments[1] || this.anyKeyPath
   ,   hollaback      = arguments[2]
@@ -102,8 +77,9 @@ Glue.prototype.addObserver= function(){
   }
 
   if( keyPath.match(/\,/gi) ){
-    kps = keyPath.split(",")
-    for(var i =0; i < kps.length; i++){
+    kps = keyPath.split(",");
+    var i;
+    for(i=0; i < kps.length; i++){
       this.listeners.push({
         "observedObject": observedObject,
         "target":         target,
@@ -125,10 +101,11 @@ Glue.prototype.addObserver= function(){
 // Removes listener.
 // It is ok to remove a listener that has not .
 Glue.prototype.removeObserver= function(target, keyPath){
-  if( this.isNothing(target) ) throw "Target must be an object instance."
-  for(var i=this.listeners.length ; i >= 0; i--){
+  if( this.isNothing(target) ){ throw "Target must be an object instance."; }
+  var i;
+  for(i=this.listeners.length ; i >= 0; i--){
     if(this.listeners[i].target === target && this.listeners[i].keyPath === keyPath){
-      this.listeners.splice(i,1)
+      this.listeners.splice(i,1);
     }
   }
   return this;
@@ -137,7 +114,8 @@ Glue.prototype.removeObserver= function(target, keyPath){
 // keypath can be null, just as it can be assigned as null
 // This provides a way to observe arbitrary/global events from a Controller.
 Glue.prototype.broadcast= function(keyPath, payload){
-  for(var i=0 ; i < this.listeners.length ; i++){
+  var i;
+  for(i=0 ; i < this.listeners.length ; i++){
     var listener = this.listeners[i];
     if( this.isArray(listener.observedObject) || (listener.observedObject === this.boundObject) ) {
       if( listener.keyPath === this.anyKeyPath || keyPath === listener.keyPath ) {

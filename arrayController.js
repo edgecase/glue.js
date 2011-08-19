@@ -13,14 +13,16 @@
 
 var ArrayController = function() {
   Glue.call(this);
-  this.bindTo(arguments[0] || []);
-}
+  this.baseObject = [];
+  this.bindTo(arguments[0] || this.baseObject);
+};
+
 ArrayController.prototype = Glue.prototype;
 
 ArrayController.prototype.add = function(item) {
   if (!this.isObservable(item)){
     item = new ObjectController(item);
-  };
+  }
 
   this.boundObject.push(item);
   this.broadcast.call(this, "add", {
@@ -32,7 +34,8 @@ ArrayController.prototype.add = function(item) {
 };
 
 ArrayController.prototype.remove = function(item) {
-  for(var i=this.count(); i >= 0; i--){
+  var i;
+  for(i=this.count(); i >= 0; i--){
     if(this.boundObject[i] === item){
       this.removeAtIndex(i);
     }
