@@ -52,3 +52,5 @@ ObjectController.prototype.set = function(keyPath, newValue){
   return this;
 };
 
+[!!window ? 'window' : 'module'].ObjectController = ObjectController;
+

@@ -31,7 +31,7 @@ if ( !Array.prototype.forEach ) {
 
 String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); }
 
-function Glue(){
+var Glue = function(){
   this.anyKeyPath = "*"
   this.listeners= [];
 }
@@ -51,10 +51,6 @@ Glue.prototype.setPropertyOnBoundObject = function(keyPath, newValue, obj) {
     keyPaths.shift()
     this.setPropertyOnBoundObject(keyPaths.join("."), newValue, obj[firstKeyPath] || {});
   }
-};
-
-Glue.prototype.bindTo = function(objectReference){
-  this.boundObject = objectReference;
 };
 
 Glue.prototype.isObservable = function(o){
@@ -140,3 +136,5 @@ Glue.prototype.broadcast= function(keyPath, payload){
   }
   return this;
 };
+
+[!!window ? 'window' : 'module'].Glue = Glue;

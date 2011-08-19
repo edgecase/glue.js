@@ -19,7 +19,7 @@ ArrayController.prototype = Glue.prototype;
 
 ArrayController.prototype.add = function(item) {
   if (!this.isObservable(item)){
-    item = new ObjectController(item);
+    item = this.isArray(item) ? new ArrayController(item) : new ObjectController(item);
   };
 
   this.boundObject.push(item);
@@ -69,4 +69,6 @@ ArrayController.prototype.replaceAtIndex = function(item, indx) {
 
   return this;
 };
+
+[!!window ? 'window' : 'module'].ArrayController = ArrayController;
 
