@@ -136,3 +136,5 @@ Glue.prototype.broadcast= function(keyPath, payload){
   }
   return this;
 };
+
+[!!window ? 'window' : 'module'].Glue = Glue;

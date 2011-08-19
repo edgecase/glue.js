@@ -70,3 +70,5 @@ ArrayController.prototype.replaceAtIndex = function(item, indx) {
   return this;
 };
 
+[!!window ? 'window' : 'module'].ArrayController = ArrayController;
+
