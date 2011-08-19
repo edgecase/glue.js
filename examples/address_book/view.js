@@ -23,7 +23,6 @@ $(function() {
   });
 
   contactController.addObserver($detailedView, "firstname, lastname", function(msg) {
-    console.log(msg.newValue);
     $(this).find("#first-name").val(msg.object.get("firstname"));
     $(this).find("#last-name").val(msg.object.get("lastname"));
   });

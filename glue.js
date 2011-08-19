@@ -84,8 +84,6 @@ Glue.prototype.addObserver= function(){
   var target = arguments[0];
   if( this.isNothing(target) ) throw "Target must be an object instance."
 
-  console.log("akp: "+this.anyKeyPath);
-  console.log("kp: "+ arguments[1]);
   var keyPath        = arguments[1] || this.anyKeyPath
   ,   hollaback      = arguments[2]
   ,   observedObject = this.boundObject
