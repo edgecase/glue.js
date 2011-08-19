@@ -31,7 +31,7 @@ if ( !Array.prototype.forEach ) {
 
 String.prototype.trim = function() { return this.replace(/^\s+|\s+$/g, ''); }
 
-function Glue(){
+var Glue = function(){
   this.anyKeyPath = "*"
   this.listeners= [];
 }
