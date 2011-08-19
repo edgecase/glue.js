@@ -3,6 +3,7 @@ $(function() {
   ,   $summary      = $('#contact-summary')
   ,   $overview     = $('#contact-overview')
   ,   $flash        = $('#flash')
+  ,   $tree         = $('#tree')
   ;
 
   var contactInstance = new Contact();
@@ -30,7 +31,7 @@ $(function() {
   contactController.addObserver($flash, "*", function(msg) {
     $newEl = $("<div />").text("updated: "+ msg.keyPath+" from: "+msg.oldValue.toString() +" to: "+msg.newValue.toString());
     $(this).append($newEl);
-    $newEl.delay(4000).fadeOut(function(){ $(this).remove(); });
+    $newEl.delay(2000).fadeOut(function(){ $(this).remove(); });
   });
 
   contactController.addObserver($summary.find(".phone-count"), "phones", function(msg) {
@@ -43,19 +44,9 @@ $(function() {
 
   // bootstrap main UX
   contactController.set("lastname", "Flores");
-  $summary.find(".phone-count").text( contactController.get("phones.length")+" phone numbers" );
-  $summary.find(".email-count").text( contactController.get("emails.length")+" email addrs" );
+  $summary.find(".phone-count").text( contactController.get("phones").length +" phone numbers" );
+  $summary.find(".email-count").text( contactController.get("emails").length +" email addrs" );
 
-  var count = 0;
-  var pid = window.setInterval(function(){
-    count++;
-    if(count > 5){
-      window.clearInterval(pid);
-    } else {
-      var emails = contactController.get("emails");
-      emails.push( { primary: true, type: "office"+count.toString(), value: "leon"+count.toString()+"@edgecase.com" } );
-      contactController.set("emails", emails);
-    }
-  }, 2000);
- 
+  $tree.append("Felix's mother is: " + contactController.get("family.tree.mother") );
+  $tree.append("<br>Felix's father is: " + contactController.get("family.tree.father") );
 });
