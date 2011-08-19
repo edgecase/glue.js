@@ -19,26 +19,36 @@
 //       must establish those observers independently of the
 //       collection in which they are added.
 
-
-
 var ObjectController = function(concreteObjectReference) {
   this.boundObject = concreteObjectReference;
   Glue.call(this)
 }
 ObjectController.prototype = Glue.prototype;
 
+ObjectController.prototype.get = function(keyPath, obj) {
+  if( !obj ) obj = this.boundObject;
+  var keyPaths = keyPath.split(/\./);
+  var firstKeyPath = keyPaths[0];
+  var currentValue = obj[firstKeyPath];
+  if( !currentValue) return;
+  if( keyPaths.length < 2 ){
+    return currentValue;
+  } else {
+    keyPaths.shift();
+    return this.get(keyPaths.join("."), currentValue);
+  }
+};
+
 ObjectController.prototype.set = function(keyPath, newValue){
-  var old = this.get(keyPath);
-  this.boundObject[keyPath] = newValue;
+  var oldValue = this.get(keyPath);
+  var expectedNewValue = newValue;
+  this.setPropertyOnBoundObject(keyPath, newValue, this.boundObject);
   this.broadcast.call(this, keyPath, {
-    "keyPath" : keyPath,
     "object"  : this,
-    "oldValue": old,
-    "newValue": newValue
+    "keyPath" : keyPath,
+    "oldValue": oldValue,
+    "newValue": expectedNewValue
   });
   return this;
 };
 
-ObjectController.prototype.get = function(key){
-  return this.boundObject[key];
-};

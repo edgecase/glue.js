@@ -5,6 +5,23 @@ function Glue(){
   this.listeners= [];
 }
 
+// Recursively set properties based on keyPaths.
+//
+// example:
+// var obj = { "foo": { "bar": { "baz": "Leon" } } };
+// obj.setPropertyOnBoundObject("foo.bar.baz", "Jerry")
+// -> { "foo": { "bar": { "baz": "Jerry" } } };
+Glue.prototype.setPropertyOnBoundObject = function(keyPath, newValue, obj) {
+  var keyPaths = keyPath.split(/\./);
+  var firstKeyPath = keyPaths[0];
+  if( keyPaths.length < 2 || keyPaths.length > 0 ){
+    obj[firstKeyPath] = newValue;
+  } else {
+    keyPaths.shift()
+    this.setPropertyOnBoundObject(keyPaths.join("."), newValue, obj[firstKeyPath] || {});
+  }
+};
+
 Glue.prototype.bindTo = function(objectReference){
   this.boundObject = objectReference;
 };
@@ -44,14 +61,24 @@ Glue.prototype.addObserver= function(){
   if( this.isFunc(keyPath) ){
     hollaback = keyPath;
     keyPath   = this.anyKeyPath;
+  } else if( keyPath.match(/\,/gi) ){
+    kps = keyPath.replace(/\s/gi,"").split(",")
+    for(var i =0; i < kps.length; i++){
+      this.listeners.push({
+        "observedObject": observedObject,
+        "target":         target,
+        "keyPath":        kps[i],
+        "hollaback":      hollaback,
+      });
+    }
+  } else {
+    this.listeners.push({
+      "observedObject": observedObject,
+      "target":         target,
+      "keyPath":        keyPath,
+      "hollaback":      hollaback,
+    });
   }
-
-  this.listeners.push({
-    "observedObject": observedObject,
-    "target":         target,
-    "keyPath":        keyPath,
-    "hollaback":      hollaback,
-  });
   return this;
 };
 
