@@ -1,7 +1,9 @@
 var vows = require('vows'),
     assert = require('assert');
 
-var glue = require("./lib/glue.js");
+var Glue = require("../lib/glue"),
+    ObjectController = require("../lib/glue/objectController");
+    ArrayController = require("../lib/glue/arrayController");
 
 var suite = vows.describe('glue.js');
 
@@ -38,4 +40,5 @@ suite.addBatch({
       }
     }
   }
-});
+}).export(module);
+
