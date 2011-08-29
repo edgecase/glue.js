@@ -1,44 +1,32 @@
-var vows = require('vows'),
-    assert = require('assert');
+var vows = require('vows')
+,   util = require('util')
+,   assert = require('assert')
 
-var Glue = require("../lib/glue"),
-    ObjectController = require("../lib/glue/objectController");
-    ArrayController = require("../lib/glue/arrayController");
-
-var suite = vows.describe('glue.js');
+,   suite = vows.describe('Glue private functions')
+,   Glue = require("../lib/glue");
 
 suite.addBatch({
-  "an ObjectController": {
-    "with no arguments":{
-      topic: function(){
-        return new ObjectController();
-      },
-      "is valid without an argument":function(topic){
-        assert.isNotNull(topic);
-        assert.isNotNull(topic.addObserver);
-        assert.isNotNull(topic.removeObserver);
-        assert.isNotNull(topic.bindTo);
-        assert.isNotNull(topic.broadcast);
-        assert.isNotNull(topic.get);
-        assert.isNotNull(topic.set);
-      }
+  "setPropertyOnBoundObject": {
+    "simple assignment": function() {
+      var topic = new Glue({level1: ''});
+
+      topic.setPropertyOnBoundObject('level1', 'top level');
+      assert.equal(topic.boundObject.level1, "top level");
     },
-    "with one argument":{
-      topic: function(){
-        return new ObjectController({"name":"Leon"});
-      },
-      "is valid with an object":function(topic){
-        assert.isNotNull(topic);
-        assert.isNotNull(topic.addObserver);
-        assert.isNotNull(topic.removeObserver);
-        assert.isNotNull(topic.bindTo);
-        assert.isNotNull(topic.broadcast);
-        assert.equal(topic.get("name"), "Leon");
-        assert.equal(topic.set("name", "Felix"), "Felix");
-        assert.equal(topic.get("name"), "Felix");
-        assert.equal(topic.set("name", "Leon"), "Leon");
-      }
+
+    "singly nested assignment": function() {
+      var topic = new Glue({level1: {level2: ''}});
+
+      topic.setPropertyOnBoundObject('level1.level2', 'two levels');
+      assert.equal(topic.boundObject.level1.level2, "two levels");
+    },
+
+    "doubly nested assignment": function() {
+      var topic = new Glue({level1: {level2: {level3: ''}}});
+
+      topic.setPropertyOnBoundObject('level1.level2.level3', 'three levels');
+      assert.equal(topic.boundObject.level1.level2.level3, "three levels");
     }
-  }
+  },
 }).export(module);
 
