@@ -59,16 +59,25 @@ suite.addBatch({
 });
 
 suite.addBatch({
-  "get with calculated keypath": {
+  // Developers should only set keyPaths to functions whose invocation
+  // has no side effects.
+  //
+  // ex. count()
+  //
+  // If you set a keypath to somethingThatWillChangeTheObjectsState()
+  // getting "somethingThatWillChangeTheObjectsState()" can change other
+  // attributes in the objects which will go on unreported to other listeners
 
-    "a calculated property": function(topic) {
+  "get with functional keypath": {
+
+    "a functional property": function(topic) {
       var topic = new Glue({
         foo: function() {
           return 3;
         }
       });
 
-      assert.equal(topic.get("(foo)"), 3);
+      assert.equal(topic.get("foo()"), 3);
     },
 
     "a nested calculated property": function(topic) {
@@ -80,7 +89,7 @@ suite.addBatch({
         }
       });
 
-      assert.equal(topic.get("foo.(bar)"), 3);
+      assert.equal(topic.get("foo.bar()"), 3);
     },
 
     "a chained calculated property": function(topic) {
@@ -88,6 +97,73 @@ suite.addBatch({
         foo: function() {
           return { bar: 3 };
         }
+      });
+
+      assert.equal(topic.get("foo().bar"), 3);
+    },
+
+    "a complex chained calculated property": function(topic) {
+      var topic = new Glue({
+        foo: {
+          bar: function() {
+            return { baz: 3 };
+          }
+        }
+      });
+
+      assert.equal(topic.get("foo.bar().baz"), 3);
+    }
+  }
+});
+
+suite.addBatch({
+  // The use of "(" and ")" to get calculated attribute is there for the convinience of
+  // the developer, but it is indeed equivalent a normal keypath.
+  //
+  // For example getting keypath "foo" is equivalent to getting "(foo)", or "foo.(bar)"
+  // and "(foo).bar" and so forth
+
+  "get with calculated keypath": {
+
+    "a functional property": function(topic) {
+      var topic = new Glue({
+        foo: (function() {
+          return 3;
+        })()
+      });
+
+      assert.equal(topic.get("(foo)"), 3);
+    },
+
+    "a nested calculated property": function(topic) {
+      var topic = new Glue({
+        foo: {
+          bar: (function() {
+            return 3;
+          })()
+        }
+      });
+
+      assert.equal(topic.get("foo.(bar)"), 3);
+    },
+
+    "a nested calculated property": function(topic) {
+      var topic = new Glue({
+        foo: {
+          bar: (function() {
+            return { baz: 3 };
+          })()
+        }
+      });
+
+      assert.equal(topic.get("foo.(bar).baz"), 3);
+    },
+
+    "a chained calculated property": function(topic) {
+      var topic = new Glue({
+        foo: (function() {
+          return { bar: 3 };
+        })()
       });
 
       assert.equal(topic.get("(foo).bar"), 3);
@@ -165,51 +241,54 @@ suite.addBatch({
 
       topic.set("foo", "baz");
       assert.equal(listenerHollaBackWasInvoked, true);
+    },
+
+    "when invoked, returns itself for chainability": function(topic) {
+      var returnedValue = topic.addObserver(1, function(){});
+      assert.equal(topic, returnedValue);
     }
   }
 });
 
+suite.addBatch({
+  "addObserver complex behavior": {
 
-// suite.addBatch({
-//   "addObserver with calculated and funtion keypath": {
-//     topic: new Glue({
-//       internalArray: [],
-// 
-//       foo: this.internalArray.length,
-// 
-//       bar: function() {
-//         return this.internalArray.length;
-//       }
-//     }),
-// 
-//     "can specify that a keypath is calculated": function(topic) {
-//       var listenerHollaBackWasInvoked = false;
-// 
-//       topic.addObserver(myObj, '(foo)', function() {
-//         listenerHollaBackWasInvoked = true;
-//       });
-// 
-//       topic.set('internalArray' = []);
-//       assert.equal(listenerHollaBackWasInvoked, false);
-// 
-//       topic.set('internalArray' = [3]);
-//       assert.equal(listenerHollaBackWasInvoked, true);
-//     },
-// 
-//     "can specify that a keypath is a function": function(topic) {
-//       var listenerHollaBackWasInvoked = false;
-// 
-//       topic.addObserver(myObj, 'foo()', function() {
-//         listenerHollaBackWasInvoked = true;
-//       });
-// 
-//       topic.set('internalArray' = []);
-//       assert.equal(listenerHollaBackWasInvoked, false);
-// 
-//       topic.set('internalArray' = [3]);
-//       assert.equal(listenerHollaBackWasInvoked, true);
-//     }
-//   }
-// });
+    topic: new Glue({
+      internalArray: [],
+
+      bar: function() {
+        return this.internalArray.length;
+      }
+    }),
+
+    // "can specify that a keypath is calculated": function(topic) {
+    //   var listenerHollaBackWasInvoked = false;
+
+    //   topic.addObserver({an: 'object'}, '(foo)', function() {
+    //     listenerHollaBackWasInvoked = true;
+    //   });
+
+    //   topic.set('internalArray', []);
+    //   assert.equal(listenerHollaBackWasInvoked, false);
+
+    //   topic.set('internalArray', [3]);
+    //   assert.equal(listenerHollaBackWasInvoked, true);
+    // },
+
+    "can specify that a keypath is a function": function(topic) {
+      var listenerHollaBackWasInvoked = false;
+
+      topic.addObserver({an: 'object'}, 'bar()', function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.set('internalArray', []);
+      assert.equal(listenerHollaBackWasInvoked, false);
+
+      topic.set('internalArray', [3]);
+      assert.equal(listenerHollaBackWasInvoked, true);
+    }
+  }
+});
 
 suite.export(module);
