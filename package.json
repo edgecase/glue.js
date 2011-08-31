@@ -1,0 +1,7 @@
+{ "name": "glue.js"
+, "version": "0.1.0"
+, "description": "Simple Controllers for JavaScript"
+, "dependencies":
+  { "vows": ">=0.5.10"
+  }
+}
