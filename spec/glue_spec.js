@@ -62,21 +62,35 @@ suite.addBatch({
   "get with calculated keypath": {
 
     "a calculated property": function(topic) {
-      var topic = new Glue({foo: 'bar'});
+      var topic = new Glue({
+        foo: function() {
+          return 3;
+        }
+      });
 
-      assert.equal(topic.get("(foo)"), "bar");
+      assert.equal(topic.get("(foo)"), 3);
     },
 
     "a nested calculated property": function(topic) {
-      var topic = new Glue({foo: {bar: 'baz'}});
+      var topic = new Glue({
+        foo: {
+          bar: function() {
+            return 3;
+          }
+        }
+      });
 
-      assert.equal(topic.get("foo.(bar)"), "baz");
+      assert.equal(topic.get("foo.(bar)"), 3);
     },
 
     "a chained calculated property": function(topic) {
-      var topic = new Glue({foo: {bar: 'baz'}});
+      var topic = new Glue({
+        foo: function() {
+          return { bar: 3 };
+        }
+      });
 
-      assert.equal(topic.get("(foo).bar"), "baz");
+      assert.equal(topic.get("(foo).bar"), 3);
     }
   }
 });
