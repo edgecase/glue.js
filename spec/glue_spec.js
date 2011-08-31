@@ -252,12 +252,17 @@ suite.addBatch({
 
 suite.addBatch({
   "addObserver complex behavior": {
-    "can specify that a keypath is calculated": function() {
-      var topic = new Glue({
-        internalArray: [],
-      });
+    topic: new Glue({
+      internalArray: [2],
 
+      bar: function() {
+        return this.internalArray.length;
+      }
+    }),
+
+    "can specify that a keypath is calculated": function(topic) {
       var listenerHollaBackWasInvoked = false;
+      topic.set('internalArray', []);
 
       topic.addObserver({an: 'object'}, 'internalArray.(length)', function() {
         listenerHollaBackWasInvoked = true;
@@ -270,16 +275,9 @@ suite.addBatch({
       assert.equal(listenerHollaBackWasInvoked, true);
     },
 
-    "can specify that a keypath is a function": function() {
-      var topic = new Glue({
-        internalArray: [],
-
-        bar: function() {
-          return this.internalArray.length;
-        }
-      });
-
+    "can specify that a keypath is a function": function(topic) {
       var listenerHollaBackWasInvoked = false;
+      topic.set('internalArray', []);
 
       topic.addObserver({an: 'object'}, 'bar()', function() {
         listenerHollaBackWasInvoked = true;
