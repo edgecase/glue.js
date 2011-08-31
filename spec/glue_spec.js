@@ -253,7 +253,7 @@ suite.addBatch({
 suite.addBatch({
   "addObserver complex behavior": {
     topic: new Glue({
-      internalArray: [2],
+      internalArray: [],
 
       bar: function() {
         return this.internalArray.length;
