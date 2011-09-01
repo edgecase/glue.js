@@ -189,6 +189,39 @@ suite.addBatch({
   }
 });
 
+
+suite.addBatch({
+  "bindTo": {
+    topic: new Glue({an: "object"}),
+
+    "changes the glue instance's bound object": function(topic) {
+      var boundObject = topic.getBoundObject();
+      topic.bindTo({another: "object"});
+
+      assert.notDeepEqual({another: "object"}, boundObject);
+      assert.deepEqual({an: "object"}, boundObject);
+
+    },
+
+    "listeners to boundObject are invoked": function(topic) {
+      var listenerHollaBackWasInvoked = false;
+
+      topic.addObserver({an: "object"}, function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.bindTo();
+
+      assert.equal(listenerHollaBackWasInvoked, true);
+    },
+
+    "when invoked, returns itself for chainability": function(topic) {
+      var returnedValue = topic.addObserver(1, function(){});
+      assert.equal(topic, returnedValue);
+    }
+  }
+});
+
 suite.addBatch({
   "addObserver": {
     topic: new Glue({foo: "bar", baz: "zap"}),
