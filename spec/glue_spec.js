@@ -203,18 +203,16 @@ suite.addBatch({
 
     },
 
-    "does not modify bound if called without any arguments": function(topic) {
-      var boundObject = topic.getBoundObject();
+    "listeners to boundObject are invoked": function(topic) {
+      var listenerHollaBackWasInvoked = false;
+
+      topic.addObserver({an: "object"}, function() {
+        listenerHollaBackWasInvoked = true;
+      });
 
       topic.bindTo();
-      assert.deepEqual(boundObject, topic.boundObject);
 
-    },
-
-    "returns a copy of the boundObject": function(topic) {
-      var boundObject = topic.getBoundObject();
-
-      assert.deepEqual(boundObject, topic.bindTo());
+      assert.equal(listenerHollaBackWasInvoked, true);
     }
   }
 });
