@@ -196,11 +196,25 @@ suite.addBatch({
 
     "changes the glue instance's bound object": function(topic) {
       var boundObject = topic.getBoundObject();
-
       topic.bindTo({another: "object"});
-      assert.deepEqual({another: "object"}, topic.boundObject);
-      assert.notDeepEqual({an: "object"}, topic.boundObject);
 
+      assert.notDeepEqual({another: "object"}, boundObject);
+      assert.deepEqual({an: "object"}, boundObject);
+
+    },
+
+    "does not modify bound if called without any arguments": function(topic) {
+      var boundObject = topic.getBoundObject();
+
+      topic.bindTo();
+      assert.deepEqual(boundObject, topic.boundObject);
+
+    },
+
+    "returns a copy of the boundObject": function(topic) {
+      var boundObject = topic.getBoundObject();
+
+      assert.deepEqual(boundObject, topic.bindTo());
     }
   }
 });
