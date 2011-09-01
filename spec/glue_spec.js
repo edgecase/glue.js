@@ -213,6 +213,11 @@ suite.addBatch({
       topic.bindTo();
 
       assert.equal(listenerHollaBackWasInvoked, true);
+    },
+
+    "when invoked, returns itself for chainability": function(topic) {
+      var returnedValue = topic.addObserver(1, function(){});
+      assert.equal(topic, returnedValue);
     }
   }
 });
