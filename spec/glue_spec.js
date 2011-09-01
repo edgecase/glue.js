@@ -189,6 +189,22 @@ suite.addBatch({
   }
 });
 
+
+suite.addBatch({
+  "bindTo": {
+    topic: new Glue({an: "object"}),
+
+    "changes the glue instance's bound object": function(topic) {
+      var boundObject = topic.getBoundObject();
+
+      topic.bindTo({another: "object"});
+      assert.deepEqual({another: "object"}, topic.boundObject);
+      assert.notDeepEqual({an: "object"}, topic.boundObject);
+
+    }
+  }
+});
+
 suite.addBatch({
   "addObserver": {
     topic: new Glue({foo: "bar", baz: "zap"}),
