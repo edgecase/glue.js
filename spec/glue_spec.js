@@ -206,7 +206,7 @@ suite.addBatch({
     "listeners to boundObject are invoked": function(topic) {
       var listenerHollaBackWasInvoked = false;
 
-      topic.addObserver({an: "object"}, function() {
+      topic.addListener({an: "object"}, function() {
         listenerHollaBackWasInvoked = true;
       });
 
@@ -216,20 +216,20 @@ suite.addBatch({
     },
 
     "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addObserver(1, function(){});
+      var returnedValue = topic.addListener(1, function(){});
       assert.equal(topic, returnedValue);
     }
   }
 });
 
 suite.addBatch({
-  "addObserver": {
+  "addListener": {
     topic: new Glue({foo: "bar", baz: "zap"}),
 
     "can be assigned to an anonymous function": function(topic) {
       var listenerHollaBackWasInvoked = false;
 
-      topic.addObserver(function() {
+      topic.addListener(function() {
         listenerHollaBackWasInvoked = true;
       });
 
@@ -240,7 +240,7 @@ suite.addBatch({
     "can be assigned to an object": function(topic) {
       var listenerHollaBackWasInvoked = false;
 
-      topic.addObserver({an: 'object'}, function() {
+      topic.addListener({an: 'object'}, function() {
         listenerHollaBackWasInvoked = true;
       });
 
@@ -251,7 +251,7 @@ suite.addBatch({
     "can be assigned to an anonymous function with a keypath": function(topic) {
       var listenerHollaBackWasInvoked = false;
 
-      topic.addObserver(function() {
+      topic.addListener(function() {
         listenerHollaBackWasInvoked = true;
       }, 'foo');
 
@@ -265,7 +265,7 @@ suite.addBatch({
     "can be assigned to an object with a keypath": function(topic) {
       var listenerHollaBackWasInvoked = false;
 
-      topic.addObserver({an: 'object'}, 'foo', function() {
+      topic.addListener({an: 'object'}, 'foo', function() {
         listenerHollaBackWasInvoked = true;
       });
 
@@ -277,14 +277,14 @@ suite.addBatch({
     },
 
     "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addObserver(1, function(){});
+      var returnedValue = topic.addListener(1, function(){});
       assert.equal(topic, returnedValue);
     }
   }
 });
 
 suite.addBatch({
-  "addObserver complex behavior": {
+  "addListener complex behavior": {
     topic: new Glue({
       internalArray: [],
 
@@ -297,7 +297,7 @@ suite.addBatch({
       var listenerHollaBackWasInvoked = false;
       topic.set('internalArray', []);
 
-      topic.addObserver({an: 'object'}, 'internalArray.(length)', function() {
+      topic.addListener({an: 'object'}, 'internalArray.(length)', function() {
         listenerHollaBackWasInvoked = true;
       });
 
@@ -312,7 +312,7 @@ suite.addBatch({
       var listenerHollaBackWasInvoked = false;
       topic.set('internalArray', []);
 
-      topic.addObserver({an: 'object'}, 'bar()', function() {
+      topic.addListener({an: 'object'}, 'bar()', function() {
         listenerHollaBackWasInvoked = true;
       });
 
