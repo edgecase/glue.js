@@ -191,6 +191,10 @@ suite.addBatch({
 
 
 suite.addBatch({
+
+});
+
+suite.addBatch({
   "bindTo": {
     topic: new Glue({an: "object"}),
 
@@ -321,6 +325,82 @@ suite.addBatch({
 
       topic.set('internalArray', [3]);
       assert.equal(listenerHollaBackWasInvoked, true);
+    }
+  }
+});
+
+suite.addBatch({
+  "removeListener": {
+    topic: new Glue({
+      internalArray: [],
+
+      bar: function() {
+        return this.internalArray.length;
+      }
+    }),
+
+    "removes all listeners if no arguments are passed": function(topic) {
+      var listenerHollaBackWasInvoked = false;
+
+      topic.addListener({my: "listener1"}, "internalArray", function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.addListener({my: "listener2"}, "bar()", function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.removeListener();
+      topic.set('internalArray', [2]);
+
+      assert.equal(listenerHollaBackWasInvoked, false);
+    },
+
+    "if only the hollaback is passed, all listeners matching the hollaback will be removed": function(topic) {
+      var hollaback1Invoked = false
+      ,   hollaBack2Invoked = false;
+
+      var hollaback1 = function() {
+        hollaback1Invoked = true;
+      }
+
+      topic.addListener(hollaback1);
+      topic.addListener('internalArray', hollaback1);
+      topic.addListener('bar()', hollaback1);
+
+      topic.addListener(function() {
+        hollaBack2Invoked = true;
+      });
+
+      topic.removeListener(hollaback1);
+      topic.set('internalArray', [3]);
+
+      assert.equal(hollaback1Invoked, false);
+      assert.equal(hollaBack2Invoked, true);
+    },
+
+    "if no listeners are left after a removeListner, that keyPath is removed" : function(topic) {
+      topic.addListener(function(){});
+      topic.removeListener();
+
+      assert.equal(topic.listeners['*'], undefined);
+    },
+
+    "if only the keyPath is passed, all listeners matching the keyPath will be deleted": function(topic) {
+      var listenerHollaBackWasInvoked = false;
+
+      topic.addListener("internalArray", function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.addListener("bar()", function() {
+        listenerHollaBackWasInvoked = true;
+      });
+
+      topic.removeListener('*');
+      topic.set('internalArray', [2]);
+
+      assert.equal(listenerHollaBackWasInvoked, false);
     }
   }
 });
