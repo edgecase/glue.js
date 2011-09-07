@@ -18,10 +18,10 @@ suite.addBatch({
 
     "calls listners to boundObject when invoked": function(topic) {
       var oldObject = topic.boundObject,
-          broadcast = topic.broadcast;
+          notify = topic.notify;
 
 
-      topic.broadcast = function() {
+      topic.notify = function() {
         assert.equal(arguments[0], "boundObject");
         assert.deepEqual(arguments[1], {
           oldValue: oldObject,
@@ -30,7 +30,7 @@ suite.addBatch({
       };
 
       topic.bindTo();
-      topic.broadcast = broadcast;
+      topic.notify = notify;
     },
 
     "when invoked, returns itself for chainability": function(topic) {
