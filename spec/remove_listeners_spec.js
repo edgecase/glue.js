@@ -69,6 +69,24 @@ suite.addBatch({
 
       topic.set("internalArray", [3]);
       assert.deepEqual(anObject, {an: 'orange'});
+    },
+
+    "removes by keypath": function(topic) {
+      var anObject = {an: 'object'};
+      topic.set("internalArray", []);
+
+      topic.addListener(anObject, "internalArray", function() {
+        this.an = "orange";
+      });
+
+      topic.addListener(anObject, "bar()", function() {
+        this.an = "apple";
+      });
+
+      topic.removeListener({keyPath: "bar()"});
+
+      topic.set("internalArray", [3]);
+      assert.deepEqual(anObject, {an: 'orange'});
     }
   }
 });
