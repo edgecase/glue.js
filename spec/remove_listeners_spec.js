@@ -6,7 +6,7 @@ var vows = require('vows')
 ,   Glue = require("../lib/glue");
 
 suite.addBatch({
-  "non calculated keyPaths": {
+  "": {
     topic: new Glue({
       internalArray: [],
 
