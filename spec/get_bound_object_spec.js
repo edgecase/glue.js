@@ -16,8 +16,8 @@ suite.addBatch({
       var boundObject = topic.getBoundObject();
 
       boundObject.foo = 2;
-      assert.deepEqual(topic.boundObject, {foo: 1});
-      assert.notDeepEqual(topic.boundObject, {foo: 2});
+      assert.deepEqual(topic.getBoundObject(), {foo: 1});
+      assert.notDeepEqual(topic.getBoundObject(), {foo: 2});
     }
   }
 });

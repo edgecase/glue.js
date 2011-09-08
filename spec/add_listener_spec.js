@@ -1,5 +1,6 @@
 var vows = require('vows')
 ,   assert = require('assert')
+,   util = require('util')
 
 ,   suite = vows.describe('addListener')
 ,   Glue = require("../lib/glue");
@@ -10,81 +11,54 @@ suite.addBatch({
     topic: new Glue({foo: "bar", baz: "zap"}),
 
     "can be assigned to an anonymous function": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var hollabackInvoked = false;
 
-      var hollaback = function() {};
-
-      topic.addListener(hollaback);
-      assert.deepEqual(topic.listeners, {
-        '*': [
-          {
-            target: hollaback,
-            hollaback: hollaback
-          }
-        ]
+      topic.addListener(function() {
+        hollabackInvoked = true;
       });
 
-      assert.deepEqual(topic.listenersCalcOrFunc, {});
+      topic.set('foo', 'zap');
+      assert.equal(hollabackInvoked, true);
     },
 
     "can be assigned to an object": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var anObject = {an: 'object'};
 
-      var hollaback = function() {};
-
-      topic.addListener({an: 'object'}, hollaback);
-      assert.deepEqual(topic.listeners, {
-        '*': [
-          {
-            target: {an: 'object'},
-            hollaback: hollaback
-          }
-        ]
+      topic.addListener(anObject, function(msg) {
+        this.an = msg.value;
       });
 
-      assert.deepEqual(topic.listenersCalcOrFunc, {});
+      topic.set('foo', 'apple');
+
+      assert.deepEqual(anObject, {an: 'apple'});
     },
 
     "can be assigned to an anonymous function with a keypath": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var hollabackInvoked = false;
 
-      var hollaback = function() {};
+      topic.addListener(function() {
+        hollabackInvoked = true;
+      }, 'foo');
 
-      topic.addListener(hollaback, 'foo');
+      topic.set('baz', 'bar');
+      assert.equal(hollabackInvoked, false);
 
-      assert.deepEqual(topic.listeners, {
-        'foo': [
-          {
-            target: hollaback,
-            hollaback: hollaback
-          }
-        ]
-      });
-
-      assert.deepEqual(topic.listenersCalcOrFunc, {});
+      topic.set('foo', 'baz');
+      assert.equal(hollabackInvoked, true);
     },
 
     "can be assigned to an object with a keypath": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var anObject = {an: 'object'};
 
-      var hollaback = function() {};
-
-      topic.addListener({an: 'object'}, 'foo', hollaback);
-
-      assert.deepEqual(topic.listeners, {
-        'foo': [
-          {
-            target: {an: 'object'},
-            hollaback: hollaback
-          }
-        ]
+      topic.addListener(anObject, 'foo', function(msg) {
+        this.an = msg.value;
       });
 
-      assert.deepEqual(topic.listenersCalcOrFunc, {});
+      topic.set('baz', 'bar');
+      assert.deepEqual(anObject, {an: 'object'});
+
+      topic.set('foo', 'apple');
+      assert.deepEqual(anObject, {an: 'apple'});
     },
 
     "when invoked, returns itself for chainability": function(topic) {
@@ -102,43 +76,27 @@ suite.addBatch({
     }),
 
     "can be assigned to an anonymous function": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var hollabackInvoked = false;
+      topic.set('internalArray', []);
 
-      var hollaback = function() {};
+      topic.addListener(function() {
+        hollabackInvoked = true;
+      }, 'internalArray.(length)');
 
-      topic.addListener(hollaback, 'internalArray.(length)');
-
-      assert.deepEqual(topic.listeners, {});
-      assert.deepEqual(topic.listenersCalcOrFunc, {
-        'internalArray.(length)': [
-          {
-            target: hollaback,
-            hollaback: hollaback,
-            oldValue: 0
-          }
-        ]
-      });
+      topic.set('internalArray', [3]);
+      assert.equal(hollabackInvoked, true);
     },
 
     "can be assigned to an object": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var anObject = {an: 'object'};
+      topic.set('internalArray', []);
 
-      var hollaback = function() {};
-
-      topic.addListener({an: 'object'}, 'internalArray.(length)', hollaback);
-
-      assert.deepEqual(topic.listeners, {});
-      assert.deepEqual(topic.listenersCalcOrFunc, {
-        'internalArray.(length)': [
-          {
-            target: {an: 'object'},
-            hollaback: hollaback,
-            oldValue: 0
-          }
-        ]
+      topic.addListener(anObject, 'internalArray.(length)', function(msg) {
+        this.an = msg.value;
       });
+
+      topic.set('internalArray', [3]);
+      assert.deepEqual(anObject, {an: 1});
     },
 
   },
@@ -155,43 +113,27 @@ suite.addBatch({
     }),
 
     "can be assigned to an anonymous function": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var hollabackInvoked = false;
+      topic.set('internalArray', []);
 
-      var hollaback = function() {};
+      topic.addListener(function() {
+        hollabackInvoked = true;
+      }, 'bar()');
 
-      topic.addListener(hollaback, 'bar()');
-
-      assert.deepEqual(topic.listeners, {});
-      assert.deepEqual(topic.listenersCalcOrFunc, {
-        'bar()': [
-          {
-            target: hollaback,
-            hollaback: hollaback,
-            oldValue: 0
-          }
-        ]
-      });
+      topic.set('internalArray', [3]);
+      assert.equal(hollabackInvoked, true);
     },
 
     "can specify that a keypath is a function": function(topic) {
-      topic.listeners = {};
-      topic.listenersCalcOrFunc = {};
+      var anObject = {an: 'object'};
+      topic.set('internalArray', []);
 
-      var hollaback = function() {};
-
-      topic.addListener({an: 'object'}, 'bar()', hollaback);
-
-      assert.deepEqual(topic.listeners, {});
-      assert.deepEqual(topic.listenersCalcOrFunc, {
-        'bar()': [
-          {
-            target: {an: 'object'},
-            hollaback: hollaback,
-            oldValue: 0
-          }
-        ]
+      topic.addListener(anObject, 'bar()', function(msg) {
+        this.an = msg.value;
       });
+
+      topic.set('internalArray', [3]);
+      assert.deepEqual(anObject, {an: 1});
     }
 
   }
