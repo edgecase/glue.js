@@ -11,26 +11,27 @@ suite.addBatch({
     "changes the glue instance's bound object": function(topic) {
       topic.bindTo({another: "object"});
 
-      assert.deepEqual({another: "object"}, topic.boundObject);
-      assert.notDeepEqual({an: "object"}, topic.boundObject);
+      assert.deepEqual({another: "object"}, topic.getBoundObject());
+      assert.notDeepEqual({an: "object"}, topic.getBoundObject());
 
     },
 
     "calls listners to boundObject when invoked": function(topic) {
-      var oldObject = topic.boundObject,
-          notify = topic.notify;
+      var hollaback1Invoked = false;
+          hollaback2Invoked = false;
 
+      topic.addListener(function() {
+        hollaback1Invoked = true;
+      }, "an");
 
-      topic.notify = function() {
-        assert.equal(arguments[0], "boundObject");
-        assert.deepEqual(arguments[1], {
-          oldValue: oldObject,
-          value: topic.boundObject
-        });
-      };
+      topic.addListener(function() {
+        hollaback2Invoked = true;
+      }, "boundObject");
 
       topic.bindTo();
-      topic.notify = notify;
+
+      assert.equal(hollaback1Invoked, false);
+      assert.equal(hollaback2Invoked, true);
     },
 
     "when invoked, returns itself for chainability": function(topic) {
