@@ -147,7 +147,7 @@ var anObject = {
 ```
 You can listen to `fooLength()` with the keyPath `fooLength()`.
 
-If a `keyPath` is not passed it is assigned to the `'\*'`
+If a `keyPath` is not passed it is assigned to the `'*'`
 `keyPath`, which will notify a listener whenever any attribute is set or modified on the
 boundObject.
 
@@ -179,25 +179,23 @@ glue.addListener({an: 'object'}, 'foo' function(msg) {
 set(keyPath, newValue)
 ```
 
-Set a property on the source object. `keyPath` uses dot notation to dive into the 
-object graph.
+Set a property on the `boundObject` specified by the `keyPath`.
 
+### get('keyPath', newValue)
 ```javascript
-bindTo(objectToObserve)
+get(keyPath, newValue)
 ```
+
+Gets a property on the `boundObject` specified by the `keyPath`.
+```javascript
+
+### bindTo(objectToObserve)
 
 When you pass an object instance to the Glue's construtor, you are, in effect, calling
 the bindTo function. It establishes the object that Glue is managing. This value 
 can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
 removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
 either remove them or not.
-
-```javascript
-#get(keyPath)
-```
-
-Get a property from the source object. `keyPath` uses dot notation to dive into the 
-object graph.
 
 ### Note on ObjectController keyPaths:
 ```
