@@ -11,207 +11,237 @@ without having to dive into the models object graph.
 
 ## The Solution
 
-Introduce a third object -- a Controller. The Controller is responsible for 
+Introduce a third object -- Glue. Glue is responsible for 
 brokering any messages from the model to any other object who wants to receive 
 messages.
 
 
-## Quick Example
+## Example
+Let's say you have a project that uses jQuery, with the following markup.
+
+```html
+<input type='text' id='the-word'></input>
+<div id='my-word></div>
+<div id='my-word-length></div>
+```
+
+You also have a `model` object.
 
 ```javascript
-var project           = { title: "Hey", myTask: { title: "Do stuff", due: "1/1/2012"} },
-    projectController = new ObjectController(project),
-    $myWork           = $('#my_work');
+var model = {
+  myString: '',
+  myStringSize: function() {
+    return this.myString.length;
+  };
+```
+Now let's wire it all up using `Glue`.
 
-controller.addObserver($myWork, "myTask.title", function(msg) {
-  this.html(msg.newValue);
+```javascript
+var controller    = new Glue(project),
+    $myWord       = $('#my-word'),
+    $myWordLength = $('#my-word-length');
+
+controller.addObserver($myWord, "myString", function(msg) {
+  this.html(msg.value);
 });
 
-$('input#taskTitle').change(function() {
-  projectController.set('myTask.title', $(this).val());
+controller.addObserver($myWordLength, "myStringSize()", function(msg) {
+  this.html(msg.value);
+});
+
+$('input#the-word').change(function() {
+  controller.set('myString', $(this).val());
 });
 ```
+
+Now everytime the user types into the text field `$myWord` and `$myWordLength` will be
+updated.
 
 ## API
 
-### ObjectController
-
-An ObjectController is responsible for managing the state of particular object "aka: the boundObject"
-Observers register themselves with the ObjectController and will be notified
-when the object's state modified in the scope of their keyPath.
-
-```javascript
-#new ObjectController([obj])
-```
-
-Creates a new ObjectController. `obj` can be any valid JavaScript object (though, observing a Function Object will not get you very far...)
--- a DOM element, a jQuery object, a Backbone model, a vanilla JS object, etc.
+### Constructor
+Glue is responsible for managing the state of particular object "aka: the `boundObject`"
+Observers register themselves with Glue and will be notified when the object's state 
+modified in the scope of their `keyPath`.
 
 ```javascript
-#bindTo(objectToObserve)
+new Glue(obj)
 ```
-When you pass an object instand to the ObjectController's construtor function, you
-are, in effect, calling the bindTo function. It establishes the object that the
-Controller is managing. This value can be set at anytime but be aware of the
-implecations of doing so. The observers are NOT removed from the Controller
-when bindTo is invoked and it's incumbant upon the caller to either remove them or not.
+
+Creates a new Glue instance. `obj` can be any valid JavaScript object (though, observing a 
+Function Object will not get you very far...) -- a DOM element, a jQuery object, a Backbone 
+model, a vanilla JS object, JS arrays, JS literals, etc.
+
+### addListener
+```javascript
+addListener([listener, ] [keyPath, ] callback)
+```
+
+Will notify the `listener` when `keyPath` is modified on the source object. `keyPath` uses 
+dot notation to dive into the object graph. `observer` can be any JS object. `callback` 
+is executed in the context of the `boundObject` and passed an argument that contains 
+the old, and new value of the attribute specified by the `keyPath`.
+
+#### Sample Usage
 
 ```javascript
-#set(keyPath, newValue)
-```
-
-Set a property on the source object. `keyPath` uses dot notation to dive into the 
-object graph.
-
-```javascript
-#get(keyPath)
-```
-
-Get a property from the source object. `keyPath` uses dot notation to dive into the 
-object graph.
-
-```javascript
-#addObserver(observer, [keyPath,] callback)
-```
-
-Will notify `observer` when `keyPath` is modified on the source object. `keyPath` uses 
-dot notation to dive into the object graph. `observer` can be any JS object.  
-`callback` is passed a Message object.
-
-### ArrayController
-
-ArrayControllers are a simple abstraction to provide a way to observe collections.
-
-NOTE: you cannot observe objects inside of the ArrayController as of the time of writing this
-NOTE FOR ABOVE NOTE: it will happen.
-
-```javascript
-#new ArrayController([optionalArrayOfObjects])
-```
-
-Creates a new ArrayController.
-optionalArrayOfObjects, if omitted, will default to a new JavaScript array.
-
-```javascript
-#add(objectController)
-```
-
-`objectController` is an ObjectController instance added to the observed collection.
-  If the objected added to the collection is not observable, a new ObjectController is
-  created and the object is bound to it. This newly wrapped object is then added to the 
-  observed collection prior to notifying the listeners. Allowing observers of the 
-  collection a chance to observe the newly added item in the collection.
-
-```
-#addObserver(observer, [keyPath,] callback)
-```
-Registers `observer` with the Controller. When `keyPath` is modified the `callback`
-is invoked in the context of the `observer` (e.g. `this` becomes the `observer`)
-
-#### Arguments
-`observer`: a JavaScript object interested in changes to the Controller's object.
-`keyPath`(optional): the property of interest to the `observer` in the Controller's object.
-`callback`: the function invoked when Controller's object is agumented at the `keyPath`
-            All callbacks are invoked using the `observer` as the ThisBinding context.
-
-```
-### Note on ArrayController keyPaths
-```
-The following are valid observable keyPaths in ArrayController:
-`add, remove, replace`
-
-Omitting the keyPath or using `*` implies that the `observer` is listening to all
-changes.
-
-```
-### Note on ObjectController keyPaths:
-```
-In ObjectControllers the `keyPath` uses dot notation to traverse the object graph.
-`observer` can be any JS object. `callback` is passed a Message object.
-
-Valid keyPath examples would be: "family.tree.mother" but not "family.tree.myCrazyMethod()"
-That said, you can do this. controllerInstance.get("family.tree.myCrazyMethod")()
-and it will work but the context of the call may be lost... but you can send it in with call/apply if you
-still have a reference to the property ThisBinding context. 
-
-```
-### Example keyPaths
-```
-var people = [
-  { "name":"Leon", "age":30, "address":{ "state":"OH", "zip":32016 } },
-  { "name":"Felix", "age":20, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Adam", "age":30, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Marc", "age":30, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Justine", "age":20, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Jerry", "age":20, "address":{ "state":"OH", "zip":32016 } }
-]
-
-var personCounter = 0;
-var peopleController = new ArrayController(people);
-arrayController.addObserver(personCounter, "add", function(msg){
-  this = msg.currentCount;
+glue.addListener(function(msg) {
+  // callback
 });
 
-var jerry = { "name":"Jerry", "age":20, "address":{ "state":"OH", "zip":32016 } }
-var jerryController = new ObjectController(jerry)
+glue.addListener(function(msg) {
+  // callback
+}, 'keyPath');
 
-jerryController.addObserver(console, "name", function(msg){
-  this.log("Jerry changed his name from "+msg.oldValue+" to "+ msg.newValue);
+glue.addListener(anObject, function(msg) {
+  // callback
 });
 
-jerryController.addObserver(console, "address.zip", function(msg){
-  this.log("Jerry changed his zip from "+msg.oldValue+" to "+ msg.newValue);
+topic.addListener(anObject, 'keyPath', function(msg) {
+  // callback
+});
+```
+
+#### listener (optional)
+Whenever a listener is added to an instance of Glue, it is assigned to a `keyPath`, which 
+indicates to Glue how to access the attribute the listener wants to be notified 
+about.
+
+For example, lets say you have `var fooObject = {foo: 'object'}` which was passed to
+`new Glue(fooObject)`, if you add a listener such as this:
+
+```javascript
+glue.addListener({my: 'listener'}, "foo", function() {
+  // the callback
+});
+```
+
+Whenever the key `foo` is modified, the callback of will be executed.
+
+#### keyPath (optional)
+A `keyPath` is a string that indicates to glue how to access an attribute of the `boundObject`.
+
+For example, let's say you have:
+```javascript
+var obj = {
+  foo: 'this is great'
+}
+```
+The `keyPath` for `foo` would be `'foo'`.
+
+`keyPath`s can be chained (ex `'foo.bar'`);
+
+`keyPath`s can be calculated and function attributes.
+
+Let's say you have `var anObject = {foo: "string"}`. This means that `anObject.foo` has a 
+calculated attribute `length`. The keyPath for `foo`'s length would be `foo.(length)`.
+
+On the other hand let's say that you have:
+
+```javascript
+var anObject = {
+  foo: "string",
+  fooLength = function() {
+    this.foo.length
+  }
+```
+You can listen to `fooLength()` with the keyPath `fooLength()`.
+
+If a `keyPath` is not passed it is assigned to the `'*'`
+`keyPath`, which will notify a listener whenever any attribute is set or modified on the
+boundObject.
+
+#### Note
+If a `keyPath` is pointing to a calculated attribute or a function, they must be pure 
+functions. Augmentations to the `boundObject` object that resulted from the invocation of
+a non-pure `keyPath` could be unreported to listeners.
+
+#### callback
+The `callback` is the function that is executed when a the listener is notified by glue.
+All `callback`s are invoked in the context of the listener object, meaning that `this` 
+inside the `callback` is the listener object.
+
+For example:
+
+```javascript
+var anObject = {bar: 'listener'};
+
+glue.addListener(anObject, "foo", function() {
+  this.bar; // this is anObject, and this.bar is equivalent to anObject.bar
+});
+```
+
+`callback`s are also passed a message argument that contains the old and new value of 
+the attribute specified by the `keyPath`.
+
+```javascript
+glue.addListener({an: 'object'}, 'foo' function(msg) {
+  msg.oldValue; // this is the old value of the attribute specified by the keyPath on the boundObject
+  msg.value; // this is the new value of the attribute specified by the keyPath on the boundObject
+});
+```
+
+### set('keyPath', newValue)
+Sets a property on the `boundObject` specified by the `keyPath`, and notifies `boundObject`s that
+the value of the attribute has changed.
+
+```javascript
+var glue = new Glue({level1: {level2: ''}}).
+    callbackInvoked = false;
+
+glue.addListener(function() {
+  callbackInvoked = true;
 });
 
-See the examples for more uses of keyPath.
-### Message(ObjectController)
+glue.set('level1.level2', 'two levels');
+// => glue.getBoundObject().level1.level2 === "two levels"
+// => callbackInvoked === true
+```
 
-Message objects are passed to the callback of an observer.
+### get('keyPath', newValue)
+Gets a property on the `boundObject` specified by the `keyPath`.
 
 ```javascript
-#keyPath
+var topic = new Glue({
+  foo: {
+    bar: function() {
+      return { baz: 3 };
+    }
+  }
+});
+
+topic.get("foo.bar().baz");
+// => 3
 ```
 
-The keyPath of the modified property.
+### getBoundObject()
+Returns a clone of the bound object
 
 ```javascript
-#object
+var controller = new Glue({foo: 1}),
+    boundObject = controller.getBoundObject();
+
+// => boundObject.foo === 1;
 ```
 
-The ObjectController that is invoking the callback.
+### removeListener([[boundObject,] keypath, ] [keyPath, ])
+Removes listener(s) to the `boundObject` on the a `Glue` instance.
 
+#### Sample Usages
 ```javascript
-#oldValue
+glue.removeListener();
+
+glue.removeListener(anObject);
+
+glue.removeListener(anObject, "bar()");
+
+glue.removeListener({keyPath: "bar()"});
 ```
 
-The previous value of the modified property.
+### bindTo(objectToObserve)
 
-```javascript
-#newValue
-```
-
-The new value of the modified property.
-
-
-### Message(ArrayController)
-Message objects are passed to the callback of an observer.
-
-```
-#keyPath
-```
-
-The keyPath of the modified collection.
-
-```
-#object
-```
-
-The ArrayController that is invoking the callback.
-
-```
-#currentCount
-```
-
-The current count, provided so that the caller will not need to needlessly
-overcompute or overmemoize simple calculations.
-
+When you pass an object instance to the Glue's construtor, you are, in effect, calling
+the bindTo function. It establishes the object that Glue is managing. This value 
+can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
+removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
+either remove them or not.
