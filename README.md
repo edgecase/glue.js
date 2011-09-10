@@ -214,6 +214,16 @@ topic.get("foo.bar().baz");
 // => 3
 ```
 
+### getBoundObject()
+Returns a clone of the bound object
+
+```javascript
+var controller = new Glue({foo: 1}),
+    boundObject = controller.getBoundObject();
+
+// => boundObject.foo === 1;
+```
+
 ### removeListener([[boundObject,] keypath, ] [keyPath, ])
 
 
