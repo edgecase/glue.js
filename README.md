@@ -50,7 +50,7 @@ controller.addObserver($myWordLength, "myStringSize()", function(msg) {
 });
 
 $('input#the-word').change(function() {
-  controller.set('myTask.title', $(this).val());
+  controller.set('myString', $(this).val());
 });
 ```
 
@@ -65,7 +65,7 @@ Observers register themselves with Glue and will be notified when the object's s
 modified in the scope of their `keyPath`.
 
 ```javascript
-new Glue([obj])
+new Glue(obj)
 ```
 
 Creates a new Glue instance. `obj` can be any valid JavaScript object (though, observing a 
@@ -76,14 +76,16 @@ model, a vanilla JS object, JS arrays, JS literals, etc.
 ```javascript
 addListener([listener, ] [keyPath, ] callback)
 ```
+
+Will notify the `listener` when `keyPath` is modified on the source object. `keyPath` uses 
+dot notation to dive into the object graph. `observer` can be any JS object. `callback` 
+is executed in the context of the `boundObject` and passed an argument that contains 
+the old, and new value of the attribute specified by the `keyPath`.
+
 #### Sample Usage
 
 ```javascript
- glue.addListener(function(msg) {
-  // callback
-});
-
-glue.addListener(anObject, function(msg) {
+glue.addListener(function(msg) {
   // callback
 });
 
@@ -91,15 +93,14 @@ glue.addListener(function(msg) {
   // callback
 }, 'keyPath');
 
+glue.addListener(anObject, function(msg) {
+  // callback
+});
+
 topic.addListener(anObject, 'keyPath', function(msg) {
   // callback
 });
 ```
-
-Will notify the `listener` when `keyPath` is modified on the source object. `keyPath` uses 
-dot notation to dive into the object graph. `observer` can be any JS object. `callback` 
-is executed in the context of the `boundObject` and passed an argument that contains 
-the old, and new value of the attribute specified by the `keyPath`.
 
 #### listener (optional)
 Whenever a listener is added to an instance of Glue, it is assigned to a `keyPath`, which 
@@ -118,20 +119,46 @@ glue.addListener({my: 'listener'}, "foo", function() {
 Whenever the key `foo` is modified, the callback of will be executed.
 
 #### keyPath (optional)
-A `keyPath` is a string that 
+A `keyPath` is a string that indicates to glue how to access an attribute of the `boundObject`.
 
+For example, let's say you have:
+```javascript
+var obj = {
+  foo: 'this is great'
+}
+```
+The `keyPath` for `foo` would be `'foo'`.
+
+`keyPath`s can be chained (ex `'foo.bar'`);
+
+`keyPath`s can be calculated and function attributes.
+
+Let's say you have `var anObject = {foo: "string"}`. This means that `anObject.foo` has a 
+calculated attribute `length`. The keyPath for `foo`'s length would be `foo.(length)`.
+
+On the other hand let's say that you have:
+
+```javascript
+var anObject = {
+  foo: "string",
+  fooLength = function() {
+    this.foo.length
+  }
+```
+You can listen to `fooLength()` with the keyPath `fooLength()`.
 
 If a `keyPath` is not passed it is assigned to the `'*'`
 `keyPath`, which will notify a listener whenever any attribute is set or modified on the
 boundObject.
 
-For example you can:
 
+### set('keyPath', newValue)
 ```javascript
-glue.addListener({my: 'listener'}, function() {
-  // the callback
-});
+set(keyPath, newValue)
 ```
+
+Set a property on the source object. `keyPath` uses dot notation to dive into the 
+object graph.
 
 ```javascript
 bindTo(objectToObserve)
@@ -142,13 +169,6 @@ the bindTo function. It establishes the object that Glue is managing. This value
 can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
 removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
 either remove them or not.
-
-```javascript
-set(keyPath, newValue)
-```
-
-Set a property on the source object. `keyPath` uses dot notation to dive into the 
-object graph.
 
 ```javascript
 #get(keyPath)
