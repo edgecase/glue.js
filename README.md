@@ -225,8 +225,18 @@ var controller = new Glue({foo: 1}),
 ```
 
 ### removeListener([[boundObject,] keypath, ] [keyPath, ])
+Removes listener(s) to the `boundObject` on the a `Glue` instance.
 
+#### Sample Usages
+```javascript
+glue.removeListener();
 
+glue.removeListener(anObject);
+
+glue.removeListener(anObject, "bar()");
+
+glue.removeListener({keyPath: "bar()"});
+```
 
 ### bindTo(objectToObserve)
 
