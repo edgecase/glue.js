@@ -151,6 +151,11 @@ If a `keyPath` is not passed it is assigned to the `'*'`
 `keyPath`, which will notify a listener whenever any attribute is set or modified on the
 boundObject.
 
+#### Note
+If a `keyPath` is pointing to a calculated attribute or a function, they must be pure 
+functions. Augmentations to the `boundObject` object that resulted from the invocation of
+a non-pure functions will be unreported to listeners.
+
 #### callback
 The `callback` is the function that is executed when a the listener is notified by glue.
 All `callback`s are invoked in the context of the listener object, meaning that `this` 
@@ -175,19 +180,10 @@ glue.addListener({an: 'object'}, 'foo' function(msg) {
 ```
 
 ### set('keyPath', newValue)
-```javascript
-set(keyPath, newValue)
-```
-
 Set a property on the `boundObject` specified by the `keyPath`.
 
 ### get('keyPath', newValue)
-```javascript
-get(keyPath, newValue)
-```
-
 Gets a property on the `boundObject` specified by the `keyPath`.
-```javascript
 
 ### bindTo(objectToObserve)
 
@@ -196,95 +192,3 @@ the bindTo function. It establishes the object that Glue is managing. This value
 can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
 removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
 either remove them or not.
-
-### Note on ObjectController keyPaths:
-```
-In ObjectControllers the `keyPath` uses dot notation to traverse the object graph.
-`observer` can be any JS object. `callback` is passed a Message object.
-
-Valid keyPath examples would be: "family.tree.mother" but not "family.tree.myCrazyMethod()"
-That said, you can do this. controllerInstance.get("family.tree.myCrazyMethod")()
-and it will work but the context of the call may be lost... but you can send it in with call/apply if you
-still have a reference to the property ThisBinding context. 
-
-```
-### Example keyPaths
-```
-var people = [
-  { "name":"Leon", "age":30, "address":{ "state":"OH", "zip":32016 } },
-  { "name":"Felix", "age":20, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Adam", "age":30, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Marc", "age":30, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Justine", "age":20, "address":{ "state":"OH", "zip":32016 } }
-  { "name":"Jerry", "age":20, "address":{ "state":"OH", "zip":32016 } }
-]
-
-var personCounter = 0;
-var peopleController = new ArrayController(people);
-arrayController.addObserver(personCounter, "add", function(msg){
-  this = msg.currentCount;
-});
-
-var jerry = { "name":"Jerry", "age":20, "address":{ "state":"OH", "zip":32016 } }
-var jerryController = new ObjectController(jerry)
-
-jerryController.addObserver(console, "name", function(msg){
-  this.log("Jerry changed his name from "+msg.oldValue+" to "+ msg.newValue);
-});
-
-jerryController.addObserver(console, "address.zip", function(msg){
-  this.log("Jerry changed his zip from "+msg.oldValue+" to "+ msg.newValue);
-});
-
-See the examples for more uses of keyPath.
-### Message(ObjectController)
-
-Message objects are passed to the callback of an observer.
-
-```javascript
-#keyPath
-```
-
-The keyPath of the modified property.
-
-```javascript
-#object
-```
-
-The ObjectController that is invoking the callback.
-
-```javascript
-#oldValue
-```
-
-The previous value of the modified property.
-
-```javascript
-#newValue
-```
-
-The new value of the modified property.
-
-
-### Message(ArrayController)
-Message objects are passed to the callback of an observer.
-
-```
-#keyPath
-```
-
-The keyPath of the modified collection.
-
-```
-#object
-```
-
-The ArrayController that is invoking the callback.
-
-```
-#currentCount
-```
-
-The current count, provided so that the caller will not need to needlessly
-overcompute or overmemoize simple calculations.
-
