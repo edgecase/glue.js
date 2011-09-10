@@ -185,7 +185,18 @@ glue.addListener({an: 'object'}, 'foo' function(msg) {
 Sets a property on the `boundObject` specified by the `keyPath`, and notifies `boundObject`s that
 the value of the attribute has changed.
 
+```javascript
+var glue = new Glue({level1: {level2: ''}}).
+    callbackInvoked = false;
 
+glue.addListener(function() {
+  callbackInvoked = true;
+});
+
+glue.set('level1.level2', 'two levels');
+// glue.getBoundObject().level1.level2 === "two levels"
+// callbackInvoked === true
+```
 
 ### get('keyPath', newValue)
 Gets a property on the `boundObject` specified by the `keyPath`.
