@@ -147,10 +147,32 @@ var anObject = {
 ```
 You can listen to `fooLength()` with the keyPath `fooLength()`.
 
-If a `keyPath` is not passed it is assigned to the `'*'`
+If a `keyPath` is not passed it is assigned to the `'\*'`
 `keyPath`, which will notify a listener whenever any attribute is set or modified on the
 boundObject.
 
+#### callback
+The `callback` is the function that is executed when a the listener is notified by glue.
+All `callback`s are invoked in the context of the listener object, meaning that `this` 
+inside the call back is the listener object.
+
+For example:
+
+```javascript
+glue.addListener({bar: 'listener'}, "foo", function() {
+  this.bar; // this is the bar of the listener object
+});
+```
+
+`callback`s are also passed a message argument that contains the old and new value of 
+the attribute specified by the `keyPath`.
+
+```javascript
+glue.addListener({an: 'object'}, 'foo' function(msg) {
+  msg.oldValue; // this is the old value of the attribute specified by the keyPath on the boundObject
+  msg.value; // this is the new value of the attribute specified by the keyPath on the boundObject
+});
+```
 
 ### set('keyPath', newValue)
 ```javascript
@@ -177,53 +199,6 @@ either remove them or not.
 Get a property from the source object. `keyPath` uses dot notation to dive into the 
 object graph.
 
-
-### ArrayController
-
-ArrayControllers are a simple abstraction to provide a way to observe collections.
-
-NOTE: you cannot observe objects inside of the ArrayController as of the time of writing this
-NOTE FOR ABOVE NOTE: it will happen.
-
-```javascript
-#new ArrayController([optionalArrayOfObjects])
-```
-
-Creates a new ArrayController.
-optionalArrayOfObjects, if omitted, will default to a new JavaScript array.
-
-```javascript
-#add(objectController)
-```
-
-`objectController` is an ObjectController instance added to the observed collection.
-  If the objected added to the collection is not observable, a new ObjectController is
-  created and the object is bound to it. This newly wrapped object is then added to the 
-  observed collection prior to notifying the listeners. Allowing observers of the 
-  collection a chance to observe the newly added item in the collection.
-
-```
-#addObserver(observer, [keyPath,] callback)
-```
-Registers `observer` with the Controller. When `keyPath` is modified the `callback`
-is invoked in the context of the `observer` (e.g. `this` becomes the `observer`)
-
-#### Arguments
-`observer`: a JavaScript object interested in changes to the Controller's object.
-`keyPath`(optional): the property of interest to the `observer` in the Controller's object.
-`callback`: the function invoked when Controller's object is agumented at the `keyPath`
-            All callbacks are invoked using the `observer` as the ThisBinding context.
-
-```
-### Note on ArrayController keyPaths
-```
-The following are valid observable keyPaths in ArrayController:
-`add, remove, replace`
-
-Omitting the keyPath or using `*` implies that the `observer` is listening to all
-changes.
-
-```
 ### Note on ObjectController keyPaths:
 ```
 In ObjectControllers the `keyPath` uses dot notation to traverse the object graph.
