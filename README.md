@@ -194,13 +194,25 @@ glue.addListener(function() {
 });
 
 glue.set('level1.level2', 'two levels');
-// glue.getBoundObject().level1.level2 === "two levels"
-// callbackInvoked === true
+// => glue.getBoundObject().level1.level2 === "two levels"
+// => callbackInvoked === true
 ```
 
 ### get('keyPath', newValue)
 Gets a property on the `boundObject` specified by the `keyPath`.
 
+```javascript
+var topic = new Glue({
+  foo: {
+    bar: function() {
+      return { baz: 3 };
+    }
+  }
+});
+
+topic.get("foo.bar().baz");
+// => 3
+```
 
 ### removeListener([[boundObject,] keypath, ] [keyPath, ])
 
