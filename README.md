@@ -154,18 +154,20 @@ boundObject.
 #### Note
 If a `keyPath` is pointing to a calculated attribute or a function, they must be pure 
 functions. Augmentations to the `boundObject` object that resulted from the invocation of
-a non-pure functions will be unreported to listeners.
+a non-pure `keyPath` could be unreported to listeners.
 
 #### callback
 The `callback` is the function that is executed when a the listener is notified by glue.
 All `callback`s are invoked in the context of the listener object, meaning that `this` 
-inside the call back is the listener object.
+inside the `callback` is the listener object.
 
 For example:
 
 ```javascript
-glue.addListener({bar: 'listener'}, "foo", function() {
-  this.bar; // this is the bar of the listener object
+var anObject = {bar: 'listener'};
+
+glue.addListener(anObject, "foo", function() {
+  this.bar; // this is anObject, and this.bar is equivalent to anObject.bar
 });
 ```
 
@@ -180,10 +182,18 @@ glue.addListener({an: 'object'}, 'foo' function(msg) {
 ```
 
 ### set('keyPath', newValue)
-Set a property on the `boundObject` specified by the `keyPath`.
+Sets a property on the `boundObject` specified by the `keyPath`, and notifies `boundObject`s that
+the value of the attribute has changed.
+
+
 
 ### get('keyPath', newValue)
 Gets a property on the `boundObject` specified by the `keyPath`.
+
+
+### removeListener([[boundObject,] keypath, ] [keyPath, ])
+
+
 
 ### bindTo(objectToObserve)
 
