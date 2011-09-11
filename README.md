@@ -246,8 +246,8 @@ can be set at anytime but be aware of the implecations of doing so. The observer
 removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
 either remove them or not.
 
-You can add a listener to the `keyPath` "boundObject" and assign a `callback` to handle 
-the change.
+You can add a listener to the `keyPath` of the `boundObject` and assign a `callback` to 
+handle the change.
 
 Example:
 ```javascript
