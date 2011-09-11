@@ -240,8 +240,18 @@ glue.removeListener({keyPath: "bar()"});
 
 ### bindTo(objectToObserve)
 
-When you pass an object instance to the Glue's construtor, you are, in effect, calling
-the bindTo function. It establishes the object that Glue is managing. This value 
+When you pass an object instance to the `Glue`'s construtor, you are, in effect, calling
+the `bindTo` function. It establishes the object that `Glue` is managing. This value 
 can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
-removed from the Controller when bindTo is invoked and it's incumbant upon the caller to 
+removed from the `glue` instance when bindTo is invoked and it's incumbant upon the caller to 
 either remove them or not.
+
+You can add a listener to the `keyPath` of the `boundObject` and assign a `callback` to 
+handle the change.
+
+Example:
+```javascript
+glue.addListener(function() {
+  // your callback
+}, "boundObject");
+```
