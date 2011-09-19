@@ -3,7 +3,7 @@ var vows = require('vows')
 ,   assert = require('assert')
 
 ,   suite = vows.describe('Glue private functions')
-,   Glue = require("../lib/glue");
+,   Glue = require("../../lib/glue");
 
 suite.addBatch({
   "set": {
