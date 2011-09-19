@@ -23,7 +23,7 @@ describe("Glue.js", function(){
     var $nameView = $("<div/>").html(controller.get("name"));
     fixture.append($nameView);
 
-    controller.addObserver($nameView, "name", function(msg){
+    controller.addListener($nameView, "name", function(msg){
       $(this).html(msg.value);
     });
 
@@ -48,7 +48,7 @@ describe("Glue.js", function(){
 
     fixture.append(input);
 
-    controller.addObserver(jasmine, "name", function(msg){
+    controller.addListener(jasmine, "name", function(msg){
       expect( msg.value ).toEqual("Felix");
       this.log(msg.value);
     });
@@ -74,11 +74,11 @@ describe("Glue.js", function(){
       .append($nameView)
       .append($friendCountView);
 
-    glue.addObserver($friendCountView, "friends", function(msg){
+    glue.addListener($friendCountView, "friends", function(msg){
       $(this).html(msg.currentCount);
     });
 
-    glue.addObserver(jasmine, "friends", function(msg){
+    glue.addListener(jasmine, "friends", function(msg){
       this.log(msg.value.name+" was " + msg.collectionOperation + "ed to the collection");
     });
 
@@ -90,11 +90,17 @@ describe("Glue.js", function(){
     expect( glue.count("friends") ).toEqual(4);
     expect( $friendCountView.text() ).toEqual("4");
 
-    var justine = glue.removeAt("friends", 2);
-    jasmine.log(friends);
+    var justine = glue.objectAt("friends", 2);
+    glue.removeAt("friends", 2);
     expect( justine.name ).toEqual("Justine");
-    // expect( glue.count("friends") ).toEqual(3);
-    // expect( $friendCountView.text() ).toEqual("3");
+    expect( glue.count("friends") ).toEqual(3);
+    expect( $friendCountView.text() ).toEqual("3");
+
+    glue.replaceWith("friends", { name: "Aaron" }, 0);
+
+    expect( glue.count("friends") ).toEqual(3);
+    expect( $friendCountView.text() ).toEqual("3");
+    expect( glue.objectAt("friends", 0).name ).toEqual("Aaron");
   });
 
 });
