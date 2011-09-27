@@ -42,11 +42,11 @@ var controller    = new Glue(model),
     $myWord       = $('#my-word'),
     $myWordLength = $('#my-word-length');
 
-controller.addObserver($myWord, "myString", function(msg) {
+controller.addListener($myWord, "myString", function(msg) {
   this.html(msg.value);
 });
 
-controller.addObserver($myWordLength, "myStringSize()", function(msg) {
+controller.addListener($myWordLength, "myStringSize()", function(msg) {
   this.html(msg.value);
 });
 
