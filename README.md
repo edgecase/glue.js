@@ -32,7 +32,8 @@ var model = {
   myString: '',
   myStringSize: function() {
     return this.myString.length;
-  };
+  }
+};
 ```
 Now let's wire it all up using `Glue`.
 
