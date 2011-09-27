@@ -37,7 +37,7 @@ var model = {
 Now let's wire it all up using `Glue`.
 
 ```javascript
-var controller    = new Glue(project),
+var controller    = new Glue(model),
     $myWord       = $('#my-word'),
     $myWordLength = $('#my-word-length');
 
