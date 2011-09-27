@@ -21,8 +21,8 @@ Let's say you have a project that uses jQuery, with the following markup.
 
 ```html
 <input type='text' id='the-word'></input>
-<div id='my-word></div>
-<div id='my-word-length></div>
+<div id='my-word'></div>
+<div id='my-word-length'></div>
 ```
 
 You also have a `model` object.
