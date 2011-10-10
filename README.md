@@ -20,7 +20,7 @@ messages.
 Let's say you have a project that uses jQuery, with the following markup.
 
 ```html
-<input type='text' id='the-word' />
+<input type='text' id='the-word'></input>
 <div id='my-word'></div>
 <div id='my-word-length'></div>
 ```
@@ -38,15 +38,15 @@ var model = {
 Now let's wire it all up using `Glue`.
 
 ```javascript
-var controller    = new Glue(project),
+var controller    = new Glue(model),
     $myWord       = $('#my-word'),
     $myWordLength = $('#my-word-length');
 
-controller.addObserver($myWord, "myString", function(msg) {
+controller.addListener($myWord, "myString", function(msg) {
   this.html(msg.value);
 });
 
-controller.addObserver($myWordLength, "myStringSize()", function(msg) {
+controller.addListener($myWordLength, "myStringSize()", function(msg) {
   this.html(msg.value);
 });
 
