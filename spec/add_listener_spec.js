@@ -11,14 +11,14 @@ suite.addBatch({
     topic: new Glue({foo: "bar", baz: "zap"}),
 
     "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
+      var callbackInvoked = false;
 
       topic.addListener(function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       });
 
       topic.set('foo', 'zap');
-      assert.equal(hollabackInvoked, true);
+      assert.equal(callbackInvoked, true);
     },
 
     "can be assigned to an object": function(topic) {
@@ -34,17 +34,17 @@ suite.addBatch({
     },
 
     "can be assigned to an anonymous function with a keypath": function(topic) {
-      var hollabackInvoked = false;
+      var callbackInvoked = false;
 
       topic.addListener(function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       }, 'foo');
 
       topic.set('baz', 'bar');
-      assert.equal(hollabackInvoked, false);
+      assert.equal(callbackInvoked, false);
 
       topic.set('foo', 'baz');
-      assert.equal(hollabackInvoked, true);
+      assert.equal(callbackInvoked, true);
     },
 
     "can be assigned to an object with a keypath": function(topic) {
@@ -76,15 +76,15 @@ suite.addBatch({
     }),
 
     "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
+      var callbackInvoked = false;
       topic.set('internalArray', []);
 
       topic.addListener(function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       }, 'internalArray.(length)');
 
       topic.set('internalArray', [3]);
-      assert.equal(hollabackInvoked, true);
+      assert.equal(callbackInvoked, true);
     },
 
     "can be assigned to an object": function(topic) {
@@ -113,15 +113,15 @@ suite.addBatch({
     }),
 
     "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
+      var callbackInvoked = false;
       topic.set('internalArray', []);
 
       topic.addListener(function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       }, 'bar()');
 
       topic.set('internalArray', [3]);
-      assert.equal(hollabackInvoked, true);
+      assert.equal(callbackInvoked, true);
     },
 
     "can specify that a keypath is a function": function(topic) {

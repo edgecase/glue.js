@@ -17,21 +17,21 @@ suite.addBatch({
     },
 
     "calls listners to boundObject when invoked": function(topic) {
-      var hollaback1Invoked = false;
-          hollaback2Invoked = false;
+      var callback1Invoked = false;
+          callback2Invoked = false;
 
       topic.addListener(function() {
-        hollaback1Invoked = true;
+        callback1Invoked = true;
       }, "an");
 
       topic.addListener(function() {
-        hollaback2Invoked = true;
+        callback2Invoked = true;
       }, "boundObject");
 
       topic.bindTo();
 
-      assert.equal(hollaback1Invoked, false);
-      assert.equal(hollaback2Invoked, true);
+      assert.equal(callback1Invoked, false);
+      assert.equal(callback2Invoked, true);
     },
 
     "when invoked, returns itself for chainability": function(topic) {

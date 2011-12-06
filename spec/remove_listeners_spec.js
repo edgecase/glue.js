@@ -16,14 +16,14 @@ suite.addBatch({
     }),
 
     "removes all listeners if no arguments are passed": function(topic) {
-      var hollabackInvoked = false;
+      var callbackInvoked = false;
       topic.set('internalArray', []);
 
       topic.addListener({my: "listener1"}, "foo", function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       });
       topic.addListener({my: "listener2"}, "bar()", function() {
-        hollabackInvoked = true;
+        callbackInvoked = true;
       });
 
       topic.removeListener();
