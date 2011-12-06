@@ -8,10 +8,6 @@ suite.addBatch({
   "": {
     topic: new Glue(),
 
-    "keyPathIsCalculated": function(topic) {
-      assert.equal(topic.keyPathIsCalculated('(foo)'), true);
-    },
-
     "keyPathIsFunctional": function(topic) {
       assert.equal(topic.keyPathIsFunctional('foo()'), true);
     },
