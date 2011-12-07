@@ -2,7 +2,7 @@ var vows = require('vows')
 ,   assert = require('assert')
 
 ,   suite = vows.describe('bindTo')
-,   Glue = require("../lib/glue");
+,   Glue = require(__dirname + "/../lib/glue");
 
 suite.addBatch({
   "ensure change happens and listners are notified": {
@@ -11,8 +11,8 @@ suite.addBatch({
     "changes the glue instance's bound object": function(topic) {
       topic.bindTo({another: "object"});
 
-      assert.deepEqual({another: "object"}, topic.getBoundObject());
-      assert.notDeepEqual({an: "object"}, topic.getBoundObject());
+      assert.deepEqual({another: "object"}, topic.target);
+      assert.notDeepEqual({an: "object"}, topic.target);
 
     },
 
@@ -26,7 +26,7 @@ suite.addBatch({
 
       topic.addListener(function() {
         callback2Invoked = true;
-      }, "boundObject");
+      }, "target");
 
       topic.bindTo();
 
@@ -35,7 +35,7 @@ suite.addBatch({
     },
 
     "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addListener(1, function(){});
+      var returnedValue = topic.addListener(function(){});
       assert.equal(topic, returnedValue);
     }
   }
