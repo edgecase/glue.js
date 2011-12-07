@@ -6,67 +6,67 @@ var vows = require('vows')
 ,   Glue = require("../lib/glue");
 
 suite.addBatch({
-  "for non calculated or functional keypaths": {
+  // "for non calculated or functional keypaths": {
 
-    topic: new Glue({foo: "bar", baz: "zap"}),
+  //   topic: new Glue({foo: "bar", baz: "zap"}),
 
-    "can be assigned to an anonymous function": function(topic) {
-      var callbackInvoked = false;
+  //   "can be assigned to an anonymous function": function(topic) {
+  //     var callbackInvoked = false;
 
-      topic.addListener(function() {
-        callbackInvoked = true;
-      });
+  //     topic.addListener(function() {
+  //       callbackInvoked = true;
+  //     });
 
-      topic.set('foo', 'zap');
-      assert.equal(callbackInvoked, true);
-    },
+  //     topic.set('foo', 'zap');
+  //     assert.equal(callbackInvoked, true);
+  //   },
 
-    "can be assigned to an object": function(topic) {
-      var anObject = {an: 'object'};
+  //   "can be assigned to an object": function(topic) {
+  //     var anObject = {an: 'object'};
 
-      topic.addListener(anObject, function(msg) {
-        this.an = msg.value;
-      });
+  //     topic.addListener(anObject, function(msg) {
+  //       this.an = msg.value;
+  //     });
 
-      topic.set('foo', 'apple');
+  //     topic.set('foo', 'apple');
 
-      assert.deepEqual(anObject, {an: 'apple'});
-    },
+  //     assert.deepEqual(anObject, {an: 'apple'});
+  //   },
 
-    "can be assigned to an anonymous function with a keypath": function(topic) {
-      var callbackInvoked = false;
+  //   "can be assigned to an anonymous function with a keypath": function(topic) {
+  //     var callbackInvoked = false;
 
-      topic.addListener(function() {
-        callbackInvoked = true;
-      }, 'foo');
+  //     topic.addListener(function() {
+  //       callbackInvoked = true;
+  //     }, 'foo');
 
-      topic.set('baz', 'bar');
-      assert.equal(callbackInvoked, false);
+  //     topic.set('baz', 'bar');
+  //     assert.equal(callbackInvoked, false);
 
-      topic.set('foo', 'baz');
-      assert.equal(callbackInvoked, true);
-    },
+  //     topic.set('foo', 'baz');
+  //     assert.equal(callbackInvoked, true);
+  //   },
 
-    "can be assigned to an object with a keypath": function(topic) {
-      var anObject = {an: 'object'};
+  //   "can be assigned to an object with a keypath": function(topic) {
+  //     var anObject = {an: 'object'};
 
-      topic.addListener(anObject, 'foo', function(msg) {
-        this.an = msg.value;
-      });
+  //     topic.addListener(anObject, 'foo', function(msg) {
+  //       this.an = msg.value;
+  //     });
 
-      topic.set('baz', 'bar');
-      assert.deepEqual(anObject, {an: 'object'});
+  //     topic.set('baz', 'bar');
+  //     assert.deepEqual(anObject, {an: 'object'});
 
-      topic.set('foo', 'apple');
-      assert.deepEqual(anObject, {an: 'apple'});
-    },
+  //     topic.set('foo', 'apple');
+  //     assert.deepEqual(anObject, {an: 'apple'});
+  //   },
 
-    "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addListener(1, function(){});
-      assert.equal(topic, returnedValue);
-    }
+  //   "when invoked, returns itself for chainability": function(topic) {
+  //     var returnedValue = topic.addListener(1, function(){});
+  //     assert.equal(topic, returnedValue);
+  //   }
 
-  },
+  // },
 
 
   "for calculated keyPaths": {
