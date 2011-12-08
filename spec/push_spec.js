@@ -72,6 +72,22 @@ suite.addBatch({
     }
   },
 
+  callback: {
+    "for array target object": function() {
+      var topic = new Glue([]),
+          message = { item: '', collection: ''};
+
+      topic.push(1, function(collection, item) {
+        message = [collection, item];
+      });
+
+      assert.deepEqual(message,  [[1], 1]);
+    },
+
+    "for nested array": function() {
+    }
+  },
+
   chainability: {
     topic: new Glue([]),
 

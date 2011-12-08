@@ -7,10 +7,12 @@ var vows = require('vows')
 
 suite.addBatch({
   "all key": {
-    topic: new Glue({v1: '', v2: ''}),
+    topic: new Glue({}),
 
     "removes all listeners if no key is passed": function(topic) {
       var invoked = false;
+
+      topic.target = {v1: '', v2: ''};
 
       topic.addListener(function() {
         invoked = true;
@@ -32,6 +34,44 @@ suite.addBatch({
       topic.set('v1,v2', 'set');
 
       assert.equal(invoked, false);
+    },
+
+    "removes all listeners of an object is the object is passed": function(topic) {
+      var obj1 = { arr: []}
+        , obj2 = { arr: []};
+
+      topic.target = { v1: ''};
+
+      topic.addListener(obj1, function() {
+        this.arr.push(1);
+      });
+
+      topic.addListener('v1', obj1, function() {
+        this.arr.push(1);
+      });
+
+      topic.addListener('v1.#length', obj1, function() {
+        this.arr.push(1);
+      });
+
+      topic.addListener(obj2, function() {
+        this.arr.push(1);
+      });
+
+      topic.addListener('v1', obj2, function() {
+        this.arr.push(1);
+      });
+
+      topic.addListener('v1.#length', obj2, function() {
+        this.arr.push(1);
+      });
+
+      topic.removeListener(obj2);
+
+      topic.set('v1', 1);
+
+      assert.deepEqual(obj1.arr, [1, 1, 1]);
+      assert.deepEqual(obj2.arr, []);
     }
   },
 
@@ -53,20 +93,69 @@ suite.addBatch({
       topic.set('v1', 'set');
 
       assert.deepEqual(invoked, [2]);
-    }
+    },
   },
 
   "assigned key": {
     topic: new Glue({}),
 
-    "": function(topic) {
+    "can be removed for a key": function(topic) {
+      var invoked = [];
+
+      topic.target = { v1: '' };
+
+      topic.addListener('v1', function() {
+        invoked.push(1);
+      });
+
+      topic.removeListener('v1');
+      topic.set('v1', 'set');
+
+      assert.deepEqual(invoked, []);
     }
   },
 
   "computed key": {
+    topic: new Glue({}),
+
+    "can be removed for a key": function(topic) {
+      var invoked = [];
+
+      topic.target = { arr: [] };
+
+      topic.addListener('arr.#length', function() {
+        invoked.push(1);
+      });
+
+      topic.removeListener('arr.#length');
+      topic.push('arr', 1);
+
+      assert.deepEqual(invoked, []);
+    }
   },
 
   "function key": {
+    topic: new Glue({}),
+
+    "can be removed for a key": function(topic) {
+      var invoked = [];
+
+      topic.target = {
+          arr: []
+        , len: function() {
+            return arr.length;
+          }
+      };
+
+      topic.addListener('len()', function() {
+        invoked.push(1);
+      });
+
+      topic.removeListener('len()');
+      topic.push('arr', 1);
+
+      assert.deepEqual(invoked, []);
+    }
   },
 
   "multiple": {
