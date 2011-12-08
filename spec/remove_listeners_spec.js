@@ -8,85 +8,90 @@ var vows = require('vows')
 suite.addBatch({
   "": {
     topic: new Glue({
-      internalArray: [],
-
-      bar: function() {
-        return this.internalArray.length;
-      }
+        arr: []
+      , attr: 1
+      , len: function() {
+          return this.arr.length;
+        }
     }),
 
     "removes all listeners if no arguments are passed": function(topic) {
       var callbackInvoked = false;
-      topic.set('internalArray', []);
 
-      topic.addListener({my: "listener1"}, "foo", function() {
+      topic.addListener({}, "arr", function() {
         callbackInvoked = true;
       });
-      topic.addListener({my: "listener2"}, "bar()", function() {
+      topic.addListener({}, "(len)", function() {
         callbackInvoked = true;
       });
 
       topic.removeListener();
+      topic.set('arr', [3]);
 
-      topic.set('internalArray', [3]);
+      assert.deepEqual(callbackInvoked, false);
     },
 
-    "removes by target object": function(topic) {
-      var anObject1 = {an: 'object'},
-          anObject2 = {an: 'object'};
-
-      topic.set("internalArray", []);
+    "removes all listerners of a target object is anypath is specified": function(topic) {
+      var anObject1 = [];
 
       topic.addListener(anObject1, function() {
-        this.an = 'orange';
+        this.push('a');
       });
 
-      topic.addListener(anObject2, "bar()", function() {
-        this.an = 'apple';
+      topic.addListener(anObject1, "attr", function() {
+        this.push('c');
       });
 
-      topic.removeListener(anObject1);
+      topic.addListener(anObject1, "len()", function() {
+        this.push('b');
+      });
 
-      topic.set("internalArray", [3]);
+      topic.removeListener("*", anObject1);
 
-      assert.deepEqual(anObject1, {an: 'object'});
-      assert.deepEqual(anObject2, {an: 'apple'});
+      topic.set("arr, attr", [3]);
+
+      assert.deepEqual(anObject1, []);
     },
 
-    "removes by target object and keypath": function(topic) {
-      var anObject = {an: 'object'};
-      topic.set("internalArray", []);
+    // "removes by target object and keypath": function(topic) {
+    //   var anObject = {an: 'object'};
+    //   topic.set("internalArray", []);
 
-      topic.addListener(anObject, function() {
-        this.an = 'orange';
-      });
+    //   topic.addListener(anObject, function() {
+    //     this.an = 'orange';
+    //   });
 
-      topic.addListener(anObject, "bar()", function() {
-        this.an = 'apple';
-      });
+    //   topic.addListener(anObject, "bar()", function() {
+    //     this.an = 'apple';
+    //   });
 
-      topic.removeListener(anObject, "bar()");
+    //   topic.removeListener(anObject, "bar()");
 
-      topic.set("internalArray", [3]);
-      assert.deepEqual(anObject, {an: 'orange'});
-    },
+    //   topic.set("internalArray", [3]);
+    //   assert.deepEqual(anObject, {an: 'orange'});
+    // },
 
-    "removes by keypath": function(topic) {
-      var anObject = {an: 'object'};
-      topic.set("internalArray", []);
+    // "removes by keypath": function(topic) {
+    //   var anObject = {an: 'object'};
+    //   topic.set("internalArray", []);
 
-      topic.addListener(anObject, "internalArray", function() {
-        this.an = "orange";
-      });
+    //   topic.addListener(anObject, "internalArray", function() {
+    //     this.an = "orange";
+    //   });
 
-      topic.addListener(anObject, "bar()", function() {
-        this.an = "apple";
-      });
+    //   topic.addListener(anObject, "bar()", function() {
+    //     this.an = "apple";
+    //   });
 
-      topic.removeListener({keyPath: "bar()"});
+    //   topic.removeListener({keyPath: "bar()"});
 
-      topic.set("internalArray", [3]);
-      assert.deepEqual(anObject, {an: 'orange'});
+    //   topic.set("internalArray", [3]);
+    //   assert.deepEqual(anObject, {an: 'orange'});
+    // },
+
+    "when invoked, returns itself for chainability": function(topic) {
+      var returnedValue = topic.removeListener();
+      assert.equal(topic, returnedValue);
     }
   }
 });
