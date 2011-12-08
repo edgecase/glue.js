@@ -5,36 +5,48 @@ var vows = require('vows')
 ,   Glue = require(__dirname + "/../lib/glue");
 
 suite.addBatch({
-  "ensure change happens and listners are notified": {
-    topic: new Glue({an: "object"}),
+  "ensures": {
+    "that the target object of glue is changed": function() {
+      var topic = new Glue({an: "object"});
 
-    "changes the glue instance's bound object": function(topic) {
       topic.bindTo({another: "object"});
 
-      assert.deepEqual({another: "object"}, topic.target);
-      assert.notDeepEqual({an: "object"}, topic.target);
-
+      assert.notDeepEqual(topic.topic, {an: "object"});
+      assert.deepEqual(topic.target, {another: "object"});
     },
 
-    "calls listners to boundObject when invoked": function(topic) {
-      var callback1Invoked = false;
-          callback2Invoked = false;
+    "notifies listeners with the old and new target object": function() {
+      var topic = new Glue({an: "object"})
+        , message = {};
 
-      topic.addListener(function() {
-        callback1Invoked = true;
-      }, "an");
+      topic.addListener('target', function(msg) {
+        message = msg;
+      });
 
-      topic.addListener(function() {
-        callback2Invoked = true;
-      }, "target");
+      topic.bindTo({ another: "object" });
 
-      topic.bindTo();
+      assert.deepEqual(message, {
+          oldTarget: { an: "object" }
+        , newTarget: { another: "object" }
+      });
 
-      assert.equal(callback1Invoked, false);
-      assert.equal(callback2Invoked, true);
+      this.target = { an: "object" }; //reset
     },
 
-    "when invoked, returns itself for chainability": function(topic) {
+    "executes a callback if available": function() {
+      var topic = new Glue({an: "object"})
+        , invoked = false;
+
+      topic.bindTo({}, function() {
+        invoked = true;
+      });
+
+      assert.equal(invoked, true);
+    },
+
+    "when invoked, returns itself for chainability": function() {
+      var topic = new Glue({an: "object"});
+
       var returnedValue = topic.addListener(function(){});
       assert.equal(topic, returnedValue);
     }
