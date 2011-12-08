@@ -6,47 +6,49 @@ var suite  = vows.describe('bindTo')
 
 suite.addBatch({
   "ensures": {
-    "that the target object of glue is changed": function() {
-      var topic = new Glue({an: "object"});
+    topic: new Glue({}),
 
-      topic.bindTo({another: "object"});
+    "that the target object of glue is changed": function(topic) {
+      topic.target = {};
 
-      assert.notDeepEqual(topic.topic, {an: "object"});
-      assert.deepEqual(topic.target, {another: "object"});
+      topic.bindTo({an: "object"});
+
+      assert.notDeepEqual(topic.topic, {});
+      assert.deepEqual(topic.target, {an: "object"});
     },
 
-    "notifies listeners with the old and new target object": function() {
-      var topic = new Glue({an: "object"})
-        , message = {};
+    "notifies listeners with the old and new target object": function(topic) {
+      var message = {};
+
+      topic.target = {};
 
       topic.addListener('target', function(msg) {
         message = msg;
       });
 
-      topic.bindTo({ another: "object" });
+      topic.bindTo({ an: "object" });
 
       assert.deepEqual(message, {
-          oldTarget: { an: "object" }
-        , newTarget: { another: "object" }
+          oldTarget: {}
+        , newTarget: { an: "object" }
       });
 
       this.target = { an: "object" }; //reset
     },
 
-    "executes a callback if available": function() {
-      var topic = new Glue({an: "object"})
-        , invoked = false;
+    "executes a callback if available": function(topic) {
+      var invoked = false;
 
-      topic.bindTo({}, function() {
+      topic.target = {};
+
+      topic.bindTo({an: "object"}, function() {
         invoked = true;
       });
 
       assert.equal(invoked, true);
     },
 
-    "when invoked, returns itself for chainability": function() {
-      var topic = new Glue({an: "object"});
-
+    "when invoked, returns itself for chainability": function(topic) {
       var returnedValue = topic.addListener(function(){});
       assert.equal(topic, returnedValue);
     }
