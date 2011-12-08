@@ -96,14 +96,18 @@ suite.addBatch({
 
       topic.set("v1", "bar");
 
-      assert.deepEqual(message, { oldValue: "foo", newValue: "bar"});
+      assert.deepEqual(message, {
+          operation: 'set'
+        , oldValue: "foo"
+        , newValue: "bar"
+      });
     }
   },
 
   "callback": {
     topic: new Glue({bar: 1}),
 
-    "": function(topic) {
+    "executes callback with oldValue and newValue as parameters": function(topic) {
       var invocation = [];
 
       topic.set('bar', 2, function(old, newVal) {

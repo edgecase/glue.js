@@ -29,23 +29,22 @@ suite.addBatch({
       topic.bindTo({ an: "object" });
 
       assert.deepEqual(message, {
-          oldTarget: {}
-        , newTarget: { an: "object" }
+          operation: 'target'
+        , oldValue: {}
+        , newValue: { an: "object" }
       });
-
-      this.target = { an: "object" }; //reset
     },
 
-    "executes a callback if available": function(topic) {
-      var invoked = false;
+    "executes a callback with old and new target as parameter": function(topic) {
+      var callbackParam;
 
       topic.target = {};
 
-      topic.bindTo({an: "object"}, function() {
-        invoked = true;
+      topic.bindTo({an: "object"}, function(old, newValue) {
+        callbackParam = [old, newValue]
       });
 
-      assert.equal(invoked, true);
+      assert.deepEqual(callbackParam, [{}, {an: "object"}]);
     },
 
     "when invoked, returns itself for chainability": function(topic) {

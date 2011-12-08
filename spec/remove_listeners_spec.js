@@ -6,91 +6,80 @@ var vows = require('vows')
 ,   Glue = require("../lib/glue");
 
 suite.addBatch({
-  "": {
-    topic: new Glue({
-        arr: []
-      , attr: 1
-      , len: function() {
-          return this.arr.length;
-        }
-    }),
+  "all key": {
+    topic: new Glue({v1: '', v2: ''}),
 
-    "removes all listeners if no arguments are passed": function(topic) {
-      var callbackInvoked = false;
+    "removes all listeners if no key is passed": function(topic) {
+      var invoked = false;
 
-      topic.addListener({}, "arr", function() {
-        callbackInvoked = true;
+      topic.addListener(function() {
+        invoked = true;
       });
-      topic.addListener({}, "(len)", function() {
-        callbackInvoked = true;
+
+      topic.addListener('v1', function() {
+        invoked = true;
+      });
+
+      topic.addListener('v2', function() {
+        invoked = true;
+      });
+
+      topic.addListener('v2#length', function() {
+        invoked = true;
       });
 
       topic.removeListener();
-      topic.set('arr', [3]);
+      topic.set('v1,v2', 'set');
 
-      assert.deepEqual(callbackInvoked, false);
-    },
+      assert.equal(invoked, false);
+    }
+  },
 
-    "removes all listerners of a target object is anypath is specified": function(topic) {
-      var anObject1 = [];
+  "any key": {
+    topic: new Glue({v1: ''}),
 
-      topic.addListener(anObject1, function() {
-        this.push('a');
+    "removes all listeners assigned to any key": function(topic) {
+      var invoked = [];
+
+      topic.addListener(function() {
+        invoked.push(1);
       });
 
-      topic.addListener(anObject1, "attr", function() {
-        this.push('c');
+      topic.addListener('v1', function() {
+        invoked.push(2);
       });
 
-      topic.addListener(anObject1, "len()", function() {
-        this.push('b');
-      });
+      topic.removeListener('*');
+      topic.set('v1', 'set');
 
-      topic.removeListener("*", anObject1);
+      assert.deepEqual(invoked, [2]);
+    }
+  },
 
-      topic.set("arr, attr", [3]);
+  "assigned key": {
+    topic: new Glue({}),
 
-      assert.deepEqual(anObject1, []);
-    },
+    "": function(topic) {
+    }
+  },
 
-    // "removes by target object and keypath": function(topic) {
-    //   var anObject = {an: 'object'};
-    //   topic.set("internalArray", []);
+  "computed key": {
+  },
 
-    //   topic.addListener(anObject, function() {
-    //     this.an = 'orange';
-    //   });
+  "function key": {
+  },
 
-    //   topic.addListener(anObject, "bar()", function() {
-    //     this.an = 'apple';
-    //   });
+  "multiple": {
+  },
 
-    //   topic.removeListener(anObject, "bar()");
+  "notification": {
+  },
 
-    //   topic.set("internalArray", [3]);
-    //   assert.deepEqual(anObject, {an: 'orange'});
-    // },
+  "chainability": {
+    topic: new Glue({v1: ''}),
 
-    // "removes by keypath": function(topic) {
-    //   var anObject = {an: 'object'};
-    //   topic.set("internalArray", []);
-
-    //   topic.addListener(anObject, "internalArray", function() {
-    //     this.an = "orange";
-    //   });
-
-    //   topic.addListener(anObject, "bar()", function() {
-    //     this.an = "apple";
-    //   });
-
-    //   topic.removeListener({keyPath: "bar()"});
-
-    //   topic.set("internalArray", [3]);
-    //   assert.deepEqual(anObject, {an: 'orange'});
-    // },
-
-    "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.removeListener();
+    "invoking set returns itself for chainability": function(topic) {
+      var returnedValue = topic.removeListener('v1')
       assert.equal(topic, returnedValue);
     }
   }
