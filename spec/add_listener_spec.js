@@ -10,6 +10,12 @@ suite.addBatch({
 
     "can be an anonymous function": function(topic) {
       topic.target = {v1: 0, v2: 0};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
+
       var invoked = 0;
 
       topic.addListener(function() {
@@ -25,6 +31,11 @@ suite.addBatch({
 
     "can be explicitly specified": function(topic) {
       topic.target = {v1: 0, v2: 0};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       var invoked = 0;
 
@@ -47,6 +58,11 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = {};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       topic.addListener("v1", function() {
         invoked = true;
@@ -81,6 +97,11 @@ suite.addBatch({
         , obj     = { value: '' };
 
       topic.target = {};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       topic.addListener('v1', obj, function(msg) {
         this.value = msg.newValue;
@@ -97,6 +118,11 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = { v1: {n1: 'foo'}};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       topic.addListener('v1.n1', function(msg) {
         invoked = true;
@@ -114,6 +140,11 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = {arr: [2]};
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       topic.addListener('arr#length', function() {
         invoked = true;
@@ -130,13 +161,53 @@ suite.addBatch({
       var anObject = { value: 0 };
 
       topic.target = { arr: [] };
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      }
 
       topic.addListener('arr#length', anObject, function(msg) {
         this.value = msg.newValue;
       });
 
       topic.set('arr', [1]);
-      assert.deepEqual(anObject, {value: [1]});
+      assert.deepEqual(anObject, {value: 1});
+    },
+
+    "can be assigned multiple target objects": function(topic) {
+      var obj1 = { len: 0 }
+        , obj2 = { len: 0 };
+
+      topic.target = { arr: [] };
+      topic.listeners = {
+        any: [],
+        assigned: {},
+        computed: {}
+      };
+
+      topic.addListener('arr#length', obj1, function(msg) {
+        this.len = msg.newValue;
+      });
+
+      topic.addListener('arr#length', obj2, function(msg) {
+        this.len = msg.newValue;
+      });
+
+      topic.set('arr', [1]);
+
+      assert.deepEqual(obj1, {len: 1});
+      assert.deepEqual(obj2, {len: 1});
+      assert.equal(topic.listeners.computed['arr.length'][0].length, 2);
+    }
+  },
+
+  "chainability": {
+    topic: new Glue({}),
+
+    "returns itself for chainability": function(topic) {
+      var returnedValue = topic.addListener(function() {});
+      assert.equal(topic, returnedValue);
     }
   }
 });

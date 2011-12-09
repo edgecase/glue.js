@@ -9,7 +9,7 @@ suite.addBatch({
   "all key": {
     topic: new Glue({}),
 
-    "removes all listeners if no key is passed": function(topic) {
+   "removes all listeners if no key is passed": function(topic) {
       var invoked = false;
 
       topic.target = {v1: '', v2: ''};
@@ -67,7 +67,6 @@ suite.addBatch({
       });
 
       topic.removeListener(obj2);
-
       topic.set('v1', 'set');
 
       assert.deepEqual(obj1.arr, [1, 1, 1]);
@@ -78,7 +77,7 @@ suite.addBatch({
   "any key": {
     topic: new Glue({v1: ''}),
 
-    "removes all listeners assigned to any key": function(topic) {
+    "removes all listeners": function(topic) {
       var invoked = [];
 
       topic.addListener(function() {
@@ -86,13 +85,17 @@ suite.addBatch({
       });
 
       topic.addListener('v1', function() {
-        invoked.push(2);
+        invoked.push(1);
+      });
+
+      topic.addListener('v1#length', function() {
+        this.arr.push(1);
       });
 
       topic.removeListener('*');
       topic.set('v1', 'set');
 
-      assert.deepEqual(invoked, [2]);
+      assert.deepEqual(invoked, []);
     },
   },
 
@@ -113,6 +116,29 @@ suite.addBatch({
       topic.set('v1', 'set');
 
       assert.deepEqual(invoked, []);
+    },
+
+    "can be remove for a specific key and target": function(topic) {
+      var obj = {an: 'obj'}
+        , invoked1 = false
+        , invoked2 = false;
+
+      topic.target = { v1: '' };
+
+      topic.addListener('v1', function() {
+        invoked1 = true
+      });
+
+      topic.addListener('v1', obj, function() {
+        invoked2 = true
+      });
+
+      topic.removeListener('v1', obj);
+
+      topic.set('v1', 'set');
+
+      assert.equal(invoked1, true);
+      assert.equal(invoked2, false);
     }
   },
 
@@ -132,6 +158,29 @@ suite.addBatch({
       topic.push('arr', 1);
 
       assert.deepEqual(invoked, []);
+    },
+
+    "can be remove for a specific key and target": function(topic) {
+      var obj = {an: 'obj'}
+        , invoked1 = false
+        , invoked2 = false;
+
+      topic.target = { arr: [] };
+
+      topic.addListener('arr#length', function() {
+        invoked1 = true
+      });
+
+      topic.addListener('arr#length', obj, function() {
+        invoked2 = true
+      });
+
+      topic.removeListener('arr#length', obj);
+
+      topic.push('arr', 1);
+
+      assert.equal(invoked1, true);
+      assert.equal(invoked2, false);
     }
   },
 
