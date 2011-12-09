@@ -50,7 +50,7 @@ suite.addBatch({
         this.arr.push(1);
       });
 
-      topic.addListener('v1.#length', obj1, function() {
+      topic.addListener('v1#length', obj1, function() {
         this.arr.push(1);
       });
 
@@ -62,13 +62,13 @@ suite.addBatch({
         this.arr.push(1);
       });
 
-      topic.addListener('v1.#length', obj2, function() {
+      topic.addListener('v1#length', obj2, function() {
         this.arr.push(1);
       });
 
       topic.removeListener(obj2);
 
-      topic.set('v1', 1);
+      topic.set('v1', 'set');
 
       assert.deepEqual(obj1.arr, [1, 1, 1]);
       assert.deepEqual(obj2.arr, []);
@@ -109,6 +109,7 @@ suite.addBatch({
       });
 
       topic.removeListener('v1');
+
       topic.set('v1', 'set');
 
       assert.deepEqual(invoked, []);
@@ -123,35 +124,11 @@ suite.addBatch({
 
       topic.target = { arr: [] };
 
-      topic.addListener('arr.#length', function() {
+      topic.addListener('arr#length', function() {
         invoked.push(1);
       });
 
-      topic.removeListener('arr.#length');
-      topic.push('arr', 1);
-
-      assert.deepEqual(invoked, []);
-    }
-  },
-
-  "function key": {
-    topic: new Glue({}),
-
-    "can be removed for a key": function(topic) {
-      var invoked = [];
-
-      topic.target = {
-          arr: []
-        , len: function() {
-            return arr.length;
-          }
-      };
-
-      topic.addListener('len()', function() {
-        invoked.push(1);
-      });
-
-      topic.removeListener('len()');
+      topic.removeListener('arr#length');
       topic.push('arr', 1);
 
       assert.deepEqual(invoked, []);

@@ -115,7 +115,7 @@ suite.addBatch({
 
       topic.target = {arr: [2]};
 
-      topic.addListener('arr.#length', function() {
+      topic.addListener('arr#length', function() {
         invoked = true;
       });
 
@@ -129,54 +129,14 @@ suite.addBatch({
     "can be assigned with a target object": function(topic) {
       var anObject = { value: 0 };
 
-      topic.target = { v1: 0 };
+      topic.target = { arr: [] };
 
-      topic.addListener('arr.#length', anObject, function(msg) {
+      topic.addListener('arr#length', anObject, function(msg) {
         this.value = msg.newValue;
       });
 
-      topic.set('v1', 1);
-      assert.deepEqual(anObject, {value: 1});
-    }
-  },
-
-  "for key that are have functions": {
-
-    topic: new Glue({
-      arr: [],
-
-      len: function() {
-        return this.arr.length;
-      }
-    }),
-
-    "can be assigned to an anonymous function": function(topic) {
-      var invoked = false;
-
-      topic.target = {arr: [2]};
-
-      topic.addListener('arr.len()', function() {
-        invoked = true;
-      });
-
-      topic.set('arr', [2]);
-      assert.equal(invoked, false);
-
-      topic.push('arr', 2);
-      assert.equal(invoked, true);
-    },
-
-    "can be assigned with a target object": function(topic) {
-      var anObject = { value: 0 };
-
-      topic.target = { v1: 0 };
-
-      topic.addListener('arr.len()', anObject, function(msg) {
-        this.value = msg.newValue;
-      });
-
-      topic.set('v1', 1);
-      assert.deepEqual(anObject, {value: 1});
+      topic.set('arr', [1]);
+      assert.deepEqual(anObject, {value: [1]});
     }
   }
 });
