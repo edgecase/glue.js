@@ -10,11 +10,7 @@ suite.addBatch({
 
     "can be an anonymous function": function(topic) {
       topic.target = {v1: 0, v2: 0};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       var invoked = 0;
 
@@ -31,11 +27,7 @@ suite.addBatch({
 
     "can be explicitly specified": function(topic) {
       topic.target = {v1: 0, v2: 0};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       var invoked = 0;
 
@@ -58,11 +50,7 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = {};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       topic.addListener("v1", function() {
         invoked = true;
@@ -97,11 +85,7 @@ suite.addBatch({
         , obj     = { value: '' };
 
       topic.target = {};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       topic.addListener('v1', obj, function(msg) {
         this.value = msg.newValue;
@@ -118,11 +102,7 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = { v1: {n1: 'foo'}};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       topic.addListener('v1.n1', function(msg) {
         invoked = true;
@@ -140,11 +120,7 @@ suite.addBatch({
       var invoked = false;
 
       topic.target = {arr: [2]};
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       topic.addListener('arr#length', function() {
         invoked = true;
@@ -161,11 +137,7 @@ suite.addBatch({
       var anObject = { value: 0 };
 
       topic.target = { arr: [] };
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      }
+      topic.resetListeners();
 
       topic.addListener('arr#length', anObject, function(msg) {
         this.value = msg.newValue;
@@ -180,11 +152,7 @@ suite.addBatch({
         , obj2 = { len: 0 };
 
       topic.target = { arr: [] };
-      topic.listeners = {
-        any: [],
-        assigned: {},
-        computed: {}
-      };
+      topic.resetListeners();
 
       topic.addListener('arr#length', obj1, function(msg) {
         this.len = msg.newValue;
@@ -198,7 +166,7 @@ suite.addBatch({
 
       assert.deepEqual(obj1, {len: 1});
       assert.deepEqual(obj2, {len: 1});
-      assert.equal(topic.listeners.computed['arr.length'][0].length, 2);
+      assert.equal(topic.listeners.computed['arr.length'].length, 2);
     }
   },
 
