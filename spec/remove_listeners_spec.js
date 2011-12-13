@@ -34,6 +34,7 @@ suite.addBatch({
       topic.set('v1,v2', 'set');
 
       assert.equal(invoked, false);
+      assert.deepEqual(topic.listeners.oldComputedValues['v2#length'], undefined);
     },
 
     "removes all listeners of an object is the object is passed": function(topic) {
