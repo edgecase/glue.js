@@ -5,42 +5,118 @@ var vows   = require('vows')
 var suite  = vows.describe('notification system');
 
 suite.addBatch({
-  "notifies only when a value is modified": {
+  "any key": {
     topic: new Glue({}),
 
-    "for any key": function(topic) {
+    "notifies all any key listeners when values change": function(topic) {
       var invoked = false;
-
-      topic.target = { v1: 'original' };
 
       topic.addListener(function() {
         invoked = true;
       });
 
-      topic.set('v1', 'original');
+      topic.notify('*', { oldValue: '', newValue: '' });
       assert.equal(invoked, false);
 
-      topic.set('v1', 'different');
+      topic.notify('*', { oldValue: '', newValue: 'something' });
       assert.equal(invoked, true);
-    },
+    }
+  },
 
-    "for assigned": function(topic) {
+  "assigned key": {
+    topic: new Glue({}),
+
+    "for non-nested key": function(topic) {
       var invoked = false;
-
-      topic.target = { v1: 'original' };
 
       topic.addListener('v1', function() {
         invoked = true;
       });
 
-      topic.set('v1', 'original');
+      topic.notify('v1', { oldValue: '', newValue: '' });
       assert.equal(invoked, false);
 
-      topic.set('v1', 'different');
+      topic.notify('v1', { oldValue: '', newValue: 'something' });
       assert.equal(invoked, true);
     },
 
-    "for computed": function(topic) {
+    "non-nested key notifies listeners assigned to any key": function(topic) {
+      var invoked = false;
+
+      topic.addListener(function() {
+        invoked = true;
+      });
+
+      topic.notify('v1', { oldValue: '', newValue: '' });
+      assert.equal(invoked, false);
+
+      topic.notify('v1', { oldValue: '', newValue: 'something' });
+      assert.equal(invoked, true);
+    },
+
+    "that are nested notifies the top and all decendent keys": function(topic) {
+      var invoked1 = false
+        , invoked2 = false
+        , invoked3 = false
+        , invoked4 = false;
+
+      topic.target = { v1: { v2: { v3: '' } } };
+
+      topic.addListener(function() {
+        invoked1 = true;
+      });
+
+      topic.addListener('v1', function() {
+        invoked2 = true;
+      });
+
+      topic.addListener('v1.v2', function() {
+        invoked3 = true;
+      });
+
+      topic.addListener('v1.v2.v3', function() {
+        invoked4 = true;
+      });
+
+      topic.notify('v1.v2.v3', { oldValue: '', newValue: 'something' });
+
+      assert.equal(invoked1, true);
+      assert.equal(invoked2, true);
+      assert.equal(invoked3, true);
+      assert.equal(invoked4, true);
+    },
+
+    "multiple": function(topic) {
+      var invoked1 = false
+        , invoked2 = false
+        , invoked3 = false;
+
+      topic.target = {v1: '', v2: {v3: ''}};
+
+      topic.addListener('v1', function() {
+        invoked1 = true;
+      });
+
+      topic.addListener('v2', function() {
+        invoked2 = true;
+      });
+
+      topic.addListener('v2.v3', function() {
+        invoked3 = true;
+      });
+
+      topic.notify('v1, v2.v3', { oldValue: '', newValue: 'something' });
+
+      assert.equal(invoked1, true);
+      assert.equal(invoked2, true);
+      assert.equal(invoked3, true);
+    }
+  },
+
+  "computed key": {
+    topic: new Glue({}),
+
+    "non-nested keys": function(topic) {
       var invoked = false;
 
       topic.target = { v1: 'original' };
@@ -54,32 +130,7 @@ suite.addBatch({
 
       topic.set('v1', 'different');
       assert.equal(invoked, true);
-    }
-  },
-
-  "decending": {
-    topic: new Glue({}),
-
-    "notifies parent nodes": function (topic) {
-      var invoked = [];
-
-      topic.target = { v1: { v2: { v3: '' }}};
-
-      topic.addListener("v1.v2.v3", function() {
-        invoked.push(1);
-      });
-
-      topic.addListener("v1.v2", function() {
-        invoked.push(1);
-      });
-
-      topic.addListener("v1", function() {
-        invoked.push(1);
-      });
-
-      topic.set('v1.v2.v3', 'set');
-      assert.deepEqual(invoked, [1,1,1]);
-    }
+    },
   },
 
   "chainability": {

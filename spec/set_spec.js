@@ -110,11 +110,11 @@ suite.addBatch({
     "executes callback with oldValue and newValue as parameters": function(topic) {
       var invocation = [];
 
-      topic.set('bar', 2, function(old, newVal) {
-        invocation = [old, newVal];
+      topic.set('bar', 2, function(newVal) {
+        invocation = newVal;
       });
 
-      assert.deepEqual(invocation, [1,2]);
+      assert.deepEqual(invocation, 2);
     }
   }
 });
