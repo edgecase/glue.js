@@ -75,7 +75,7 @@ suite.addBatch({
       assert.deepEqual(obj2.arr, []);
     },
 
-    "removes oldComputedValues if no listeners remain": function(topic) {
+    "removes oldValues if no listeners remain": function(topic) {
       var obj1 = { arr: []}
         , obj2 = { arr: []};
 
@@ -86,10 +86,10 @@ suite.addBatch({
       topic.addListener('v1#length', obj2, function() { });
 
       topic.removeListener(obj1);
-      assert.equal(topic.listeners.oldComputedValues['v1.length'], 1);
+      assert.equal(topic.listeners.oldValues['v1.length'], 1);
 
       topic.removeListener(obj2);
-      assert.equal(topic.listeners.oldComputedValues['v1.length'], undefined);
+      assert.equal(topic.listeners.oldValues['v1.length'], undefined);
     }
   },
 

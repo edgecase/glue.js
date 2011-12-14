@@ -38,7 +38,7 @@ suite.addBatch({
   "nested arrays": {
     topic: new Glue({ arr: [] }),
 
-    "can be push into with a keypath": function(topic) {
+    "can be push into with a key": function(topic) {
       topic.target = { arr: [] };
 
       topic.push('arr', 1);

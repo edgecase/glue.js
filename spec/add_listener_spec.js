@@ -172,13 +172,13 @@ suite.addBatch({
   "caching calculated values": {
     topic: new Glue({}),
 
-    "stores computed value into 'topic.listeners.oldComputedValues' hash ": function(topic) {
+    "stores computed value into 'topic.listeners.oldValues' hash ": function(topic) {
       topic.target = {arr: [2]};
 
       topic.addListener('arr#length', function() {});
       topic.push('arr', 2);
 
-      assert.equal(topic.listeners.oldComputedValues['arr.length'], 2);
+      assert.equal(topic.listeners.oldValues['arr.length'], 2);
     },
 
     "updates value as the calculated value changes": function(topic) {
@@ -187,10 +187,10 @@ suite.addBatch({
       topic.addListener('arr#length', function() {});
 
       topic.push('arr', 2);
-      assert.equal(topic.listeners.oldComputedValues['arr.length'], 2);
+      assert.equal(topic.listeners.oldValues['arr.length'], 2);
 
       topic.push('arr', 2);
-      assert.equal(topic.listeners.oldComputedValues['arr.length'], 3);
+      assert.equal(topic.listeners.oldValues['arr.length'], 3);
     },
   },
 
@@ -198,7 +198,7 @@ suite.addBatch({
   "multiple": {
     topic: new Glue({}),
 
-    "stores computed value into 'topic.listeners.oldComputedValues' hash ": function(topic) {
+    "stores computed value into 'topic.listeners.oldValues' hash ": function(topic) {
       var invoked = [];
       topic.target = {v1: '', v2: ''};
 
