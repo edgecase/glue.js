@@ -117,19 +117,19 @@ suite.addBatch({
     topic: new Glue({}),
 
     "non-nested keys": function(topic) {
-      var invoked = false;
+      var value = {};
 
       topic.target = { v1: 'original' };
 
-      topic.addListener('v1#length', function() {
-        invoked = true;
+      topic.addListener('v1#length', function(msg) {
+        value.newValue = msg.newValue;
       });
 
       topic.set('v1', 'original');
-      assert.equal(invoked, false);
+      assert.equal(value.newValue, undefined);
 
       topic.set('v1', 'different');
-      assert.equal(invoked, true);
+      assert.equal(value.newValue, 9);
     },
   },
 

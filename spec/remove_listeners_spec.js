@@ -12,7 +12,8 @@ suite.addBatch({
    "removes all listeners if no key is passed": function(topic) {
       var invoked = false;
 
-      topic.target = {v1: '', v2: ''};
+      topic.target = {v1: 'a', v2: 'a'};
+      topic.resetListeners();
 
       topic.addListener(function() {
         invoked = true;
@@ -34,14 +35,14 @@ suite.addBatch({
       topic.set('v1,v2', 'set');
 
       assert.equal(invoked, false);
-      assert.deepEqual(topic.listeners.oldComputedValues['v2#length'], undefined);
     },
 
-    "removes all listeners of an object is the object is passed": function(topic) {
+    "removes all listeners of an object is the object": function(topic) {
       var obj1 = { arr: []}
         , obj2 = { arr: []};
 
       topic.target = { v1: ''};
+      topic.resetListeners();
 
       topic.addListener(obj1, function() {
         this.arr.push(1);
@@ -72,6 +73,23 @@ suite.addBatch({
 
       assert.deepEqual(obj1.arr, [1, 1, 1]);
       assert.deepEqual(obj2.arr, []);
+    },
+
+    "removes oldComputedValues if no listeners remain": function(topic) {
+      var obj1 = { arr: []}
+        , obj2 = { arr: []};
+
+      topic.target = { v1: 'a'};
+      topic.resetListeners();
+
+      topic.addListener('v1#length', obj1, function() { });
+      topic.addListener('v1#length', obj2, function() { });
+
+      topic.removeListener(obj1);
+      assert.equal(topic.listeners.oldComputedValues['v1.length'], 1);
+
+      topic.removeListener(obj2);
+      assert.equal(topic.listeners.oldComputedValues['v1.length'], undefined);
     }
   },
 
@@ -186,9 +204,34 @@ suite.addBatch({
   },
 
   "multiple": {
-  },
+    topic: new Glue({}),
 
-  "notification": {
+    "removes multiple keys": function(topic) {
+      var invoked1 = false
+        , invoked2 = false
+        , invoked3 = false;
+
+      topic.target = { v1: '', v2: '' };
+
+      topic.addListener('v1', function() {
+        invoked1 = true;
+      });
+
+      topic.addListener('v2', function() {
+        invoked2 = true;
+      });
+
+      topic.addListener('v2#length', function() {
+        invoked3 = true;
+      });
+
+      topic.removeListener('v1, v2, v2#length');
+      topic.set('v1, v2', 'set');
+
+      assert.equal(invoked1, false);
+      assert.equal(invoked2, false);
+      assert.equal(invoked3, false);
+    }
   },
 
   "chainability": {
