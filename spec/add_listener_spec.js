@@ -40,6 +40,21 @@ suite.addBatch({
 
       topic.set('v2', 1);
       assert.equal(invoked, 2);
+    },
+
+    "invokes callback in the scope of the target object": function(topic) {
+      var value;
+
+      topic.target = {v1: ''};
+      topic.resetListeners();
+
+      topic.addListener(function() {
+        value = this.v1;
+      });
+
+      topic.set('v1', 'value');
+
+      assert.equal(value, 'value');
     }
   },
 
@@ -110,6 +125,21 @@ suite.addBatch({
 
       topic.set("v1.n1", "bar");
       assert.equal(invoked, true);
+    },
+
+    "invokes callback in the scope of target when not specified": function(topic) {
+      var value;
+
+      topic.target = {v1: ''};
+      topic.resetListeners();
+
+      topic.addListener('v1', function() {
+        value = this.v1;
+      });
+
+      topic.set('v1', 'value');
+
+      assert.equal(value, 'value');
     }
   },
 
