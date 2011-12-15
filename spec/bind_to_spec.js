@@ -1,41 +1,54 @@
-var vows = require('vows')
+var vows   = require('vows')
 ,   assert = require('assert')
+,   Glue   = require(__dirname + "/../lib/glue");
 
-,   suite = vows.describe('bindTo')
-,   Glue = require("../lib/glue");
+var suite  = vows.describe('bindTo')
 
 suite.addBatch({
-  "ensure change happens and listners are notified": {
-    topic: new Glue({an: "object"}),
+  "ensures": {
+    topic: new Glue({}),
 
-    "changes the glue instance's bound object": function(topic) {
-      topic.bindTo({another: "object"});
+    "that the target object of glue is changed": function(topic) {
+      topic.target = {};
 
-      assert.deepEqual({another: "object"}, topic.getBoundObject());
-      assert.notDeepEqual({an: "object"}, topic.getBoundObject());
+      topic.bindTo({an: "object"});
 
+      assert.notDeepEqual(topic.topic, {});
+      assert.deepEqual(topic.target, {an: "object"});
     },
 
-    "calls listners to boundObject when invoked": function(topic) {
-      var hollaback1Invoked = false;
-          hollaback2Invoked = false;
+    "notifies listeners with the old and new target object": function(topic) {
+      var message = {};
 
-      topic.addListener(function() {
-        hollaback1Invoked = true;
-      }, "an");
+      topic.target = {};
 
-      topic.addListener(function() {
-        hollaback2Invoked = true;
-      }, "boundObject");
+      topic.addListener('target', function(msg) {
+        message = msg;
+      });
 
-      topic.bindTo();
+      topic.bindTo({ an: "object" });
 
-      assert.equal(hollaback1Invoked, false);
-      assert.equal(hollaback2Invoked, true);
+      assert.deepEqual(message, {
+          operation: 'target'
+        , oldValue: {}
+        , newValue: { an: "object" }
+      });
+    },
+
+    "executes a callback with old and new target as parameter": function(topic) {
+      var callbackParam;
+
+      topic.target = {};
+
+      topic.bindTo({an: "object"}, function(old, newValue) {
+        callbackParam = [old, newValue]
+      });
+
+      assert.deepEqual(callbackParam, [{}, {an: "object"}]);
     },
 
     "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addListener(1, function(){});
+      var returnedValue = topic.addListener(function(){});
       assert.equal(topic, returnedValue);
     }
   }

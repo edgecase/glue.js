@@ -1,141 +1,254 @@
-var vows = require('vows')
+var vows   = require('vows')
 ,   assert = require('assert')
-,   util = require('util')
+,   Glue   = require(__dirname + "/../lib/glue");
 
-,   suite = vows.describe('addListener')
-,   Glue = require("../lib/glue");
+var suite  = vows.describe('addListener');
 
 suite.addBatch({
-  "for non calculated or functional keypaths": {
+  "any key": {
+    topic: new Glue({}),
 
-    topic: new Glue({foo: "bar", baz: "zap"}),
+    "can be an anonymous function": function(topic) {
+      topic.target = {v1: 0, v2: 0};
+      topic.resetListeners();
+
+      var invoked = 0;
+
+      topic.addListener(function() {
+        invoked++;
+      });
+
+      topic.set('v1', 1);
+      assert.equal(invoked, 1);
+
+      topic.set('v2', 1);
+      assert.equal(invoked, 2);
+    },
+
+    "can be explicitly specified": function(topic) {
+      topic.target = {v1: 0, v2: 0};
+      topic.resetListeners();
+
+      var invoked = 0;
+
+      topic.addListener("*", function() {
+        invoked++;
+      });
+
+      topic.set('v1', 1);
+      assert.equal(invoked, 1);
+
+      topic.set('v2', 1);
+      assert.equal(invoked, 2);
+    },
+
+    "invokes callback in the scope of the target object": function(topic) {
+      var value;
+
+      topic.target = {v1: ''};
+      topic.resetListeners();
+
+      topic.addListener(function() {
+        value = this.v1;
+      });
+
+      topic.set('v1', 'value');
+
+      assert.equal(value, 'value');
+    }
+  },
+
+  "assigned keys": {
+    topic: new Glue({}),
+
+    "can be assigned to a key": function(topic) {
+      var invoked = false;
+
+      topic.target = {};
+      topic.resetListeners();
+
+      topic.addListener("v1", function() {
+        invoked = true;
+      });
+
+      topic.set('v2', 'bar');
+      assert.equal(invoked, false);
+
+      topic.set('v1', 'baz');
+      assert.equal(invoked, true);
+    },
+
+    "can be assigned do an object without a key": function(topic) {
+      var invoked = false
+        , obj     = { value: '' };
+
+      topic.target = {};
+
+      topic.addListener(obj, function(mgs) {
+        obj.value = mgs.newValue;
+      });
+
+      topic.set('v1', 'baz');
+      assert.equal(obj.value, 'baz');
+
+      topic.set('v2', 'bar');
+      assert.equal(obj.value, 'bar');
+    },
+
+    "can be assigned to an object with a key": function(topic) {
+      var invoked = false
+        , obj     = { value: '' };
+
+      topic.target = {};
+      topic.resetListeners();
+
+      topic.addListener('v1', obj, function(msg) {
+        this.value = msg.newValue;
+      });
+
+      topic.set('v1', 'baz');
+      assert.equal(obj.value, 'baz');
+
+      topic.set('v2', 'bar');
+      assert.equal(obj.value, 'baz');
+    },
+
+    "can be nested": function(topic) {
+      var invoked = false;
+
+      topic.target = { v1: {n1: 'foo'}};
+      topic.resetListeners();
+
+      topic.addListener('v1.n1', function(msg) {
+        invoked = true;
+      });
+
+      topic.set("v1.n1", "bar");
+      assert.equal(invoked, true);
+    },
+
+    "invokes callback in the scope of target when not specified": function(topic) {
+      var value;
+
+      topic.target = {v1: ''};
+      topic.resetListeners();
+
+      topic.addListener('v1', function() {
+        value = this.v1;
+      });
+
+      topic.set('v1', 'value');
+
+      assert.equal(value, 'value');
+    }
+  },
+
+  "for computed keys": {
+    topic: new Glue({}),
 
     "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
+      var invoked = false;
 
-      topic.addListener(function() {
-        hollabackInvoked = true;
+      topic.target = {arr: [2]};
+      topic.resetListeners();
+
+      topic.addListener('arr#length', function() {
+        invoked = true;
       });
 
-      topic.set('foo', 'zap');
-      assert.equal(hollabackInvoked, true);
+      topic.set('arr', [2]);
+      assert.equal(invoked, false);
+
+      topic.push('arr', 2);
+      assert.equal(invoked, true);
     },
 
-    "can be assigned to an object": function(topic) {
-      var anObject = {an: 'object'};
+    "can be assigned with a target object": function(topic) {
+      var anObject = { value: 0 };
 
-      topic.addListener(anObject, function(msg) {
-        this.an = msg.value;
+      topic.target = { arr: [] };
+      topic.resetListeners();
+
+      topic.addListener('arr#length', anObject, function(msg) {
+        this.value = msg.newValue;
       });
 
-      topic.set('foo', 'apple');
-
-      assert.deepEqual(anObject, {an: 'apple'});
+      topic.set('arr', [1]);
+      assert.deepEqual(anObject, {value: 1});
     },
 
-    "can be assigned to an anonymous function with a keypath": function(topic) {
-      var hollabackInvoked = false;
+    "can be assigned multiple target objects": function(topic) {
+      var obj1 = { len: 0 }
+        , obj2 = { len: 0 };
 
-      topic.addListener(function() {
-        hollabackInvoked = true;
-      }, 'foo');
+      topic.target = { arr: [] };
+      topic.resetListeners();
 
-      topic.set('baz', 'bar');
-      assert.equal(hollabackInvoked, false);
-
-      topic.set('foo', 'baz');
-      assert.equal(hollabackInvoked, true);
-    },
-
-    "can be assigned to an object with a keypath": function(topic) {
-      var anObject = {an: 'object'};
-
-      topic.addListener(anObject, 'foo', function(msg) {
-        this.an = msg.value;
+      topic.addListener('arr#length', obj1, function(msg) {
+        this.len = msg.newValue;
       });
 
-      topic.set('baz', 'bar');
-      assert.deepEqual(anObject, {an: 'object'});
+      topic.addListener('arr#length', obj2, function(msg) {
+        this.len = msg.newValue;
+      });
 
-      topic.set('foo', 'apple');
-      assert.deepEqual(anObject, {an: 'apple'});
+      topic.set('arr', [1]);
+
+      assert.deepEqual(obj1, {len: 1});
+      assert.deepEqual(obj2, {len: 1});
+    }
+  },
+
+  "caching calculated values": {
+    topic: new Glue({}),
+
+    "stores computed value into 'topic.listeners.oldValues' hash ": function(topic) {
+      topic.target = {arr: [2]};
+
+      topic.addListener('arr#length', function() {});
+      topic.push('arr', 2);
+
+      assert.equal(topic.listeners.oldValues['arr.length'], 2);
     },
 
-    "when invoked, returns itself for chainability": function(topic) {
-      var returnedValue = topic.addListener(1, function(){});
+    "updates value as the calculated value changes": function(topic) {
+      topic.target = {arr: [2]};
+
+      topic.addListener('arr#length', function() {});
+
+      topic.push('arr', 2);
+      assert.equal(topic.listeners.oldValues['arr.length'], 2);
+
+      topic.push('arr', 2);
+      assert.equal(topic.listeners.oldValues['arr.length'], 3);
+    },
+  },
+
+
+  "multiple": {
+    topic: new Glue({}),
+
+    "stores computed value into 'topic.listeners.oldValues' hash ": function(topic) {
+      var invoked = [];
+      topic.target = {v1: '', v2: ''};
+
+      topic.addListener('v1, v2', function() {
+        invoked.push(1);
+      });
+
+      topic.set('v1, v2', 2, function() {
+        assert.equal(invoked.length, 2);
+      });
+    },
+  },
+
+  "chainability": {
+    topic: new Glue({}),
+
+    "returns itself for chainability": function(topic) {
+      var returnedValue = topic.addListener(function() {});
       assert.equal(topic, returnedValue);
     }
-
-  },
-
-
-  "for calculated keyPaths": {
-
-    topic: new Glue({
-      internalArray: [],
-    }),
-
-    "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
-      topic.set('internalArray', []);
-
-      topic.addListener(function() {
-        hollabackInvoked = true;
-      }, 'internalArray.(length)');
-
-      topic.set('internalArray', [3]);
-      assert.equal(hollabackInvoked, true);
-    },
-
-    "can be assigned to an object": function(topic) {
-      var anObject = {an: 'object'};
-      topic.set('internalArray', []);
-
-      topic.addListener(anObject, 'internalArray.(length)', function(msg) {
-        this.an = msg.value;
-      });
-
-      topic.set('internalArray', [3]);
-      assert.deepEqual(anObject, {an: 1});
-    },
-
-  },
-
-
-  "for functional keyPaths": {
-
-    topic: new Glue({
-      internalArray: [],
-
-      bar: function() {
-        return this.internalArray.length;
-      }
-    }),
-
-    "can be assigned to an anonymous function": function(topic) {
-      var hollabackInvoked = false;
-      topic.set('internalArray', []);
-
-      topic.addListener(function() {
-        hollabackInvoked = true;
-      }, 'bar()');
-
-      topic.set('internalArray', [3]);
-      assert.equal(hollabackInvoked, true);
-    },
-
-    "can specify that a keypath is a function": function(topic) {
-      var anObject = {an: 'object'};
-      topic.set('internalArray', []);
-
-      topic.addListener(anObject, 'bar()', function(msg) {
-        this.an = msg.value;
-      });
-
-      topic.set('internalArray', [3]);
-      assert.deepEqual(anObject, {an: 1});
-    }
-
   }
 });
 

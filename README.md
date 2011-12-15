@@ -19,41 +19,36 @@ messages.
 ## Example
 Let's say you have a project that uses jQuery, with the following markup.
 
-```html
-<input type='text' id='the-word'></input>
-<div id='my-word'></div>
-<div id='my-word-length'></div>
-```
+    <input type='text' id='the-word'></input>
+    <div id='my-word'></div>
+    <div id='my-word-length'></div>
 
 You also have a `model` object.
 
-```javascript
-var model = {
-  myString: '',
-  myStringSize: function() {
-    return this.myString.length;
-  }
-};
-```
+    var model = {
+      myString: '',
+      myStringSize: function() {
+        return this.myString.length;
+      }
+    };
+
 Now let's wire it all up using `Glue`.
 
-```javascript
-var controller    = new Glue(model),
-    $myWord       = $('#my-word'),
-    $myWordLength = $('#my-word-length');
+    var controller    = new Glue(model),
+        $myWord       = $('#my-word'),
+        $myWordLength = $('#my-word-length');
 
-controller.addListener($myWord, "myString", function(msg) {
-  this.html(msg.value);
-});
+    controller.addListener($myWord, "myString", function(msg) {
+      this.html(msg.value);
+    });
 
-controller.addListener($myWordLength, "myStringSize()", function(msg) {
-  this.html(msg.value);
-});
+    controller.addListener($myWordLength, "myStringSize()", function(msg) {
+      this.html(msg.value);
+    });
 
-$('input#the-word').change(function() {
-  controller.set('myString', $(this).val());
-});
-```
+    $('input#the-word').change(function() {
+      controller.set('myString', $(this).val());
+    });
 
 Now everytime the user types into the text field `$myWord` and `$myWordLength` will be
 updated.
@@ -65,18 +60,14 @@ Glue is responsible for managing the state of particular object "aka: the `bound
 Observers register themselves with Glue and will be notified when the object's state 
 modified in the scope of their `keyPath`.
 
-```javascript
-new Glue(obj)
-```
+    new Glue(obj);
 
 Creates a new Glue instance. `obj` can be any valid JavaScript object (though, observing a 
 Function Object will not get you very far...) -- a DOM element, a jQuery object, a Backbone 
 model, a vanilla JS object, JS arrays, JS literals, etc.
 
 ### addListener
-```javascript
-addListener([listener, ] [keyPath, ] callback)
-```
+    addListener([listener, ] [keyPath, ] callback);
 
 Will notify the `listener` when `keyPath` is modified on the source object. `keyPath` uses 
 dot notation to dive into the object graph. `observer` can be any JS object. `callback` 
@@ -84,24 +75,21 @@ is executed in the context of the `boundObject` and passed an argument that cont
 the old, and new value of the attribute specified by the `keyPath`.
 
 #### Sample Usage
+    glue.addListener(function(msg) {
+      // callback
+    });
 
-```javascript
-glue.addListener(function(msg) {
-  // callback
-});
+    glue.addListener(function(msg) {
+      // callback
+    }, 'keyPath');
 
-glue.addListener(function(msg) {
-  // callback
-}, 'keyPath');
+    glue.addListener(anObject, function(msg) {
+      // callback
+    });
 
-glue.addListener(anObject, function(msg) {
-  // callback
-});
-
-topic.addListener(anObject, 'keyPath', function(msg) {
-  // callback
-});
-```
+    topic.addListener(anObject, 'keyPath', function(msg) {
+      // callback
+    });
 
 #### listener (optional)
 Whenever a listener is added to an instance of Glue, it is assigned to a `keyPath`, which 
@@ -111,11 +99,9 @@ about.
 For example, lets say you have `var fooObject = {foo: 'object'}` which was passed to
 `new Glue(fooObject)`, if you add a listener such as this:
 
-```javascript
-glue.addListener({my: 'listener'}, "foo", function() {
-  // the callback
-});
-```
+    glue.addListener({my: 'listener'}, "foo", function() {
+      // the callback
+    });
 
 Whenever the key `foo` is modified, the callback of will be executed.
 
@@ -123,11 +109,10 @@ Whenever the key `foo` is modified, the callback of will be executed.
 A `keyPath` is a string that indicates to glue how to access an attribute of the `boundObject`.
 
 For example, let's say you have:
-```javascript
-var obj = {
-  foo: 'this is great'
-}
-```
+  var obj = {
+    foo: 'this is great'
+  }
+
 The `keyPath` for `foo` would be `'foo'`.
 
 `keyPath`s can be chained (ex `'foo.bar'`);
@@ -139,13 +124,13 @@ calculated attribute `length`. The keyPath for `foo`'s length would be `foo.(len
 
 On the other hand let's say that you have:
 
-```javascript
-var anObject = {
-  foo: "string",
-  fooLength = function() {
-    this.foo.length
-  }
-```
+    var anObject = {
+      foo: "string",
+      fooLength: function() {
+        this.foo.length
+      }
+    }
+
 You can listen to `fooLength()` with the keyPath `fooLength()`.
 
 If a `keyPath` is not passed it is assigned to the `'*'`
@@ -164,80 +149,68 @@ inside the `callback` is the listener object.
 
 For example:
 
-```javascript
-var anObject = {bar: 'listener'};
+    var anObject = {bar: 'listener'};
 
-glue.addListener(anObject, "foo", function() {
-  this.bar; // this is anObject, and this.bar is equivalent to anObject.bar
-});
-```
+    glue.addListener(anObject, "foo", function() {
+      this.bar; // this is anObject, and this.bar is equivalent to anObject.bar
+    });
 
 `callback`s are also passed a message argument that contains the old and new value of 
 the attribute specified by the `keyPath`.
 
-```javascript
-glue.addListener({an: 'object'}, 'foo' function(msg) {
-  msg.oldValue; // this is the old value of the attribute specified by the keyPath on the boundObject
-  msg.value; // this is the new value of the attribute specified by the keyPath on the boundObject
-});
-```
+    glue.addListener({an: 'object'}, 'foo' function(msg) {
+      msg.oldValue; // this is the old value of the attribute specified by the keyPath on the boundObject
+      msg.value; // this is the new value of the attribute specified by the keyPath on the boundObject
+    });
 
 ### set('keyPath', newValue)
 Sets a property on the `boundObject` specified by the `keyPath`, and notifies `boundObject`s that
 the value of the attribute has changed.
 
-```javascript
-var glue = new Glue({level1: {level2: ''}}).
-    callbackInvoked = false;
+    var glue = new Glue({level1: {level2: ''}})
+      , callbackInvoked = false;
 
-glue.addListener(function() {
-  callbackInvoked = true;
-});
+    glue.addListener(function() {
+      callbackInvoked = true;
+    });
 
-glue.set('level1.level2', 'two levels');
-// => glue.getBoundObject().level1.level2 === "two levels"
-// => callbackInvoked === true
-```
+    glue.set('level1.level2', 'two levels');
+    // => glue.getBoundObject().level1.level2 === "two levels"
+    // => callbackInvoked === true
 
 ### get('keyPath', newValue)
 Gets a property on the `boundObject` specified by the `keyPath`.
 
-```javascript
-var topic = new Glue({
-  foo: {
-    bar: function() {
-      return { baz: 3 };
-    }
-  }
-});
+    var topic = new Glue({
+      foo: {
+        bar: function() {
+          return { baz: 3 }
+        }
+      }
+    });
 
-topic.get("foo.bar().baz");
-// => 3
-```
+    topic.get("foo.bar().baz");
+    // => 3
 
 ### getBoundObject()
 Returns a clone of the bound object
 
-```javascript
-var controller = new Glue({foo: 1}),
-    boundObject = controller.getBoundObject();
+    var controller = new Glue({foo: 1}),
+        boundObject = controller.getBoundObject();
 
-// => boundObject.foo === 1;
-```
+    // => boundObject.foo === 1;
 
 ### removeListener([[boundObject,] keypath, ] [keyPath, ])
 Removes listener(s) to the `boundObject` on the a `Glue` instance.
 
 #### Sample Usages
-```javascript
-glue.removeListener();
+    glue.removeListener();
 
-glue.removeListener(anObject);
+    glue.removeListener(anObject);
 
-glue.removeListener(anObject, "bar()");
+    glue.removeListener(anObject, "bar()");
 
-glue.removeListener({keyPath: "bar()"});
-```
+    glue.removeListener({keyPath: "bar()"});
 
 ### bindTo(objectToObserve)
 
@@ -251,8 +224,7 @@ You can add a listener to the `keyPath` of the `boundObject` and assign a `callb
 handle the change.
 
 Example:
-```javascript
-glue.addListener(function() {
-  // your callback
-}, "boundObject");
-```
+    glue.addListener(function() {
+      // your callback
+    }, "boundObject");
+
