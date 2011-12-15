@@ -33,10 +33,7 @@ suite.addBatch({
 
       topic.remove('v1');
 
-      assert.deepEqual(message, {
-          operation: 'remove'
-        , oldValue: 'value'
-      });
+      assert.deepEqual(message, { operation: 'remove', oldValue: 'value' });
     }
   },
 
@@ -63,20 +60,20 @@ suite.addBatch({
 
       assert.deepEqual(topic.target.arr, [[1, 3], [1, 2, 3]]);
     },
-// 
-//     "notifies listeners of collection": function(topic) {
-//       var message;
-// 
-//       topic.target({arr: [1, 2, 3]});
-//       topic.addListener("arr", function(msg) {
-//         message = msg;
-//       });
-// 
-//       topic.removes(1);
-//       assert.equal(message, {
-//         operation: "remove"
-//       });
-//     }
+
+    "notifies listeners of collection": function(topic) {
+      var message;
+
+      topic.target = {arr: [1, 2, 3]};
+      topic.resetListeners();
+
+      topic.addListener("arr[0]", function(msg) {
+        message = msg;
+      });
+
+      topic.remove('arr[0]');
+      assert.deepEqual(message, { operation: "remove", oldValue: 1 });
+    }
   }
 });
 

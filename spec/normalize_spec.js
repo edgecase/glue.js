@@ -12,10 +12,6 @@ suite.addBatch({
 
     "converts '#' to '.' ": function() {
       assert.deepEqual(Glue.normalizeKey("fi#fi"), "fi.fi");
-    },
-
-    "removes stray brackets": function() {
-      assert.deepEqual(Glue.normalizeKey("0]"), "0");
     }
   }
 });
