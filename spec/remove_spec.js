@@ -74,6 +74,19 @@ suite.addBatch({
       topic.remove('arr[0]');
       assert.deepEqual(message, { operation: "remove", oldValue: 1 });
     }
+  },
+
+  "callback": {
+    topic: new Glue({v1: 'value'}),
+    "executes callback with oldValue as param": function(topic) {
+      var message;
+
+      topic.remove('v1', function(oldValue) {
+        message = oldValue
+      });
+
+      assert.equal(message, 'value');
+    }
   }
 });
 
