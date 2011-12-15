@@ -36,19 +36,19 @@ suite.addBatch({
   "nested arrays": {
     topic: new Glue({ arr: [] }),
 
-    // "can be push into with a key": function(topic) {
-    //   topic.target = { arr: [] };
+    "can be push into with a key": function(topic) {
+      topic.target = { arr: [] };
 
-    //   topic.push('arr', 1);
-    //   assert.deepEqual(topic.target.arr, [1]);
-    // },
+      topic.push('arr', 1);
+      assert.deepEqual(topic.target.arr, [1]);
+    },
 
-    // "can be push into arrays nested under other keys": function(topic) {
-    //   topic.target = { v1: { arr: [] }};
+    "can be push into arrays nested under other keys": function(topic) {
+      topic.target = { v1: { arr: [] }};
 
-    //   topic.push('v1.arr', 1);
-    //   assert.deepEqual(topic.target.v1.arr, [1]);
-    // },
+      topic.push('v1.arr', 1);
+      assert.deepEqual(topic.target.v1.arr, [1]);
+    },
 
     "can be push into arrays nested under other keys": function(topic) {
       topic.target = { arr1: [ {arr2: [] }] };
@@ -99,5 +99,3 @@ suite.addBatch({
 });
 
 suite.export(module);
-
-
