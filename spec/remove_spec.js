@@ -15,6 +15,13 @@ suite.addBatch({
       assert.equal(topic.target.v1, undefined);
     },
 
+    "removes nested key": function(topic) {
+      topic.target = {v1: {v2: 'value'}};
+      topic.remove('v1.v2');
+
+      assert.equal(topic.target.v1.v2, undefined);
+    },
+
     "notifies listeners that the value has been removed": function(topic) {
       var message;
 
@@ -43,20 +50,33 @@ suite.addBatch({
       assert.deepEqual(topic.target, [1,3]);
     },
 
-    // "notifies listeners of collection": function(topic) {
-    //   var message;
+    "remove from an array in an object": function(topic) {
+      topic.target = {arr: [1, 2, 3]};
+      topic.remove('arr[1]');
 
-    //   topic.target({arr: [1, 2, 3]});
-    //   topic.addListener("arr", function(msg) {
-    //     message = msg;
-    //   });
+      assert.deepEqual(topic.target.arr, [1,3]);
+    },
 
-    //   topic.removes(1);
-    //   assert.equal(message, {
-    //     operation: "remove",
+    "remove from a multi-dimentional array": function(topic) {
+      topic.target = {arr: [[1, 2, 3], [1, 2, 3]]};
+      topic.remove('arr[0][1]');
 
-    //   });
-    // }
+      assert.deepEqual(topic.target.arr, [[1, 3], [1, 2, 3]]);
+    },
+// 
+//     "notifies listeners of collection": function(topic) {
+//       var message;
+// 
+//       topic.target({arr: [1, 2, 3]});
+//       topic.addListener("arr", function(msg) {
+//         message = msg;
+//       });
+// 
+//       topic.removes(1);
+//       assert.equal(message, {
+//         operation: "remove"
+//       });
+//     }
   }
 });
 
