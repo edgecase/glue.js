@@ -76,8 +76,18 @@ suite.addBatch({
     }
   },
 
+  "hybrid": {
+    topic: new Glue({arr: [{v1: 'value1', v4: 'value4'}, {v2: 'value2'} ]}),
+
+    "can remove from keys that are inside an array": function(topic) {
+      topic.remove('arr[0].v1');
+      assert.deepEqual(topic.target, {arr: [{v4: 'value4'}, {v2: 'value2'} ]});
+    }
+  },
+
   "callback": {
     topic: new Glue({v1: 'value'}),
+
     "executes callback with oldValue as param": function(topic) {
       var message;
 
@@ -86,6 +96,15 @@ suite.addBatch({
       });
 
       assert.equal(message, 'value');
+    }
+  },
+
+  chainability: {
+    topic: new Glue([1]),
+
+    "returns itself for chainalibility": function(topic) {
+      var returnedValue = topic.remove('[0]');
+      assert.deepEqual(topic, returnedValue)
     }
   }
 });
