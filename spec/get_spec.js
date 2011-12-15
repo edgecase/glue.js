@@ -1,145 +1,47 @@
-var vows = require('vows')
+var vows   = require('vows')
 ,   assert = require('assert')
+,   Glue   = require(__dirname + "/../lib/glue");
 
-,   suite = vows.describe('get')
-,   Glue = require("../lib/glue");
+var suite  = vows.describe('get method');
 
 suite.addBatch({
-  "non calculated properties": {
+  "assigned value": {
+    topic: new Glue({}),
 
-    "a property": function(topic) {
-      var topic = new Glue({foo: 'bar'});
-
-      assert.equal(topic.get("foo"), "bar");
+    "can be retrieved": function(topic) {
+      topic.target = { v1: 'get this' };
+      assert.equal(topic.get('v1'), 'get this');
     },
 
-    "a nested property": function(topic) {
-      var topic = new Glue({foo: {bar: 'baz'}});
-
-      assert.equal(topic.get("foo.bar"), "baz");
-    },
-
-    "a deeply property": function(topic) {
-      var topic = new Glue({foo: {bar: {baz: 'zap'}}});
-
-      assert.equal(topic.get("foo.bar.baz"), "zap");
+    "can be nested": function(topic) {
+      topic.target = { v1: { v2: 'get this' }};
+      assert.equal(topic.get('v1.v2'), 'get this');
     }
   },
 
-  // The use of "(" and ")" to get calculated attribute is there for
-  // the convinience of the developer, but it is indeed equivalent a normal
-  // keypath.
-  //
-  // For example getting keypath "foo" is equivalent to getting "(foo)", or
-  // "foo.(bar)" and "(foo).bar" and so forth
+  "computed value": {
+    topic: new Glue({}),
 
-  "get with calculated keypath": {
-
-    "a functional property": function(topic) {
-      var topic = new Glue({
-        foo: (function() {
-          return 3;
-        })()
-      });
-
-      assert.equal(topic.get("(foo)"), 3);
+    "can be retrived": function(topic) {
+      topic.target = { arr: [1]};
+      assert.equal(topic.get('arr#length'), 1);
     },
 
-    "a nested calculated property": function(topic) {
-      var topic = new Glue({
-        foo: {
-          bar: (function() {
-            return 3;
-          })()
-        }
-      });
-
-      assert.equal(topic.get("foo.(bar)"), 3);
-    },
-
-    "a nested calculated property": function(topic) {
-      var topic = new Glue({
-        foo: {
-          bar: (function() {
-            return { baz: 3 };
-          })()
-        }
-      });
-
-      assert.equal(topic.get("foo.(bar).baz"), 3);
-    },
-
-    "a chained calculated property": function(topic) {
-      var topic = new Glue({
-        foo: (function() {
-          return { bar: 3 };
-        })()
-      });
-
-      assert.equal(topic.get("(foo).bar"), 3);
+    "can be nested": function(topic) {
+      topic.target = { v1: {arr: [1]} };
+      assert.equal(topic.get('v1.arr#length'), 1);
     }
-
   },
 
-  // Developers should only set keyPaths to functions whose invocation
-  // has no side effects.
-  //
-  // ex. count()
-  //
-  // not
-  //
-  // somethingThatWillChangeTheObjectsState()
-  //
-  // If you set a keypath to somethingThatWillChangeTheObjectsState()
-  // getting "somethingThatWillChangeTheObjectsState()" can change
-  // attributes in the objects but will not notify listeners
+  "normalizes keys": {
+    topic: new Glue({}),
 
-  "get with functional keypath": {
-
-    "a functional property": function(topic) {
-      var topic = new Glue({
-        foo: function() {
-          return 3;
-        }
-      });
-
-      assert.equal(topic.get("foo()"), 3);
-    },
-
-    "a nested calculated property": function(topic) {
-      var topic = new Glue({
-        foo: {
-          bar: function() {
-            return 3;
-          }
-        }
-      });
-
-      assert.equal(topic.get("foo.bar()"), 3);
-    },
-
-    "a chained calculated property": function(topic) {
-      var topic = new Glue({
-        foo: function() {
-          return { bar: 3 };
-        }
-      });
-
-      assert.equal(topic.get("foo().bar"), 3);
-    },
-
-    "a complex chained calculated property": function(topic) {
-      var topic = new Glue({
-        foo: {
-          bar: function() {
-            return { baz: 3 };
-          }
-        }
-      });
-
-      assert.equal(topic.get("foo.bar().baz"), 3);
+    "removes spaces on keys": function(topic) {
+      topic.target = { v1: { v2: 1 }};
+      assert.equal(topic.get('v1.         v2'), 1);
     }
   }
 });
 
 suite.export(module);
+
