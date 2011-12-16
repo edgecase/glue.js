@@ -35,18 +35,6 @@ suite.addBatch({
       });
     },
 
-    "executes a callback with old and new target as parameter": function(topic) {
-      var callbackParam;
-
-      topic.target = {};
-
-      topic.bindTo({an: "object"}, function(old, newValue) {
-        callbackParam = [old, newValue]
-      });
-
-      assert.deepEqual(callbackParam, [{}, {an: "object"}]);
-    },
-
     "when invoked, returns itself for chainability": function(topic) {
       var returnedValue = topic.addListener(function(){});
       assert.equal(topic, returnedValue);

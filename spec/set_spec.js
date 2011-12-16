@@ -102,20 +102,6 @@ suite.addBatch({
         , newValue: "bar"
       });
     }
-  },
-
-  "callback": {
-    topic: new Glue({bar: 1}),
-
-    "executes callback with oldValue and newValue as parameters": function(topic) {
-      var invocation = [];
-
-      topic.set('bar', 2, function(newVal) {
-        invocation = newVal;
-      });
-
-      assert.deepEqual(invocation, 2);
-    }
   }
 });
 

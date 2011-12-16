@@ -49,19 +49,6 @@ suite.addBatch({
     }
   },
 
-  "callback": {
-    "executes if present": function() {
-      var topic = new Glue([1, 2]),
-          message;
-
-      topic.pop(function(oldValue) {
-        message = oldValue;
-      });
-
-      assert.equal(message, 2);
-    }
-  },
-
   "returns": {
     topic: new Glue([]),
 

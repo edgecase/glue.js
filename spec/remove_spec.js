@@ -85,20 +85,6 @@ suite.addBatch({
     }
   },
 
-  "callback": {
-    topic: new Glue({v1: 'value'}),
-
-    "executes callback with oldValue as param": function(topic) {
-      var message;
-
-      topic.remove('v1', function(oldValue) {
-        message = oldValue
-      });
-
-      assert.equal(message, 'value');
-    }
-  },
-
   chainability: {
     topic: new Glue([1]),
 

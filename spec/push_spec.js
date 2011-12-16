@@ -75,19 +75,6 @@ suite.addBatch({
     }
   },
 
-  callback: {
-    "for array target object": function() {
-      var topic = new Glue([]),
-          message;
-
-      topic.push(1, function(newValue) {
-        message = newValue;
-      });
-
-      assert.equal(message, 1);
-    }
-  },
-
   chainability: {
     topic: new Glue([]),
 
