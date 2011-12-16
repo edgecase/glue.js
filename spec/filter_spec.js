@@ -2,16 +2,16 @@ var vows   = require('vows')
   , assert = require('assert')
   , Glue   = require(__dirname + "/../lib/glue")
 
-var suite  = vows.describe('reject');
+var suite  = vows.describe('filter');
 
 suite.addBatch({
   "target is collection": {
     topic: new Glue([]),
 
-    "rejects according to handler": function(topic) {
+    "filters according to handler": function(topic) {
       topic.target = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      topic.reject(function(num) {
-        return num % 2 !== 0;
+      topic.filter(function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(topic.target, [2, 4, 6, 8, 10]);
@@ -31,8 +31,8 @@ suite.addBatch({
         invoked2.push(1);
       });
 
-      topic.reject(function(num) {
-        return num % 2 !== 0;
+      topic.filter(function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(invoked1, [1,1]);
@@ -43,28 +43,28 @@ suite.addBatch({
   "target is a collection within an object": {
     topic: new Glue({}),
 
-    "can reject on array within an object": function(topic) {
+    "can filter on array within an object": function(topic) {
       topic.target = { arr: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] };
-      topic.reject('arr', function(num) {
-        return num % 2 !== 0;
+      topic.filter('arr', function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(topic.target.arr, [2, 4, 6, 8, 10]);
     },
 
-    "can reject from multidimentional arrays": function(topic) {
+    "can filter from multidimentional arrays": function(topic) {
       topic.target = { arr: [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]] };
-      topic.reject('arr[0]', function(num) {
-        return num % 2 !== 0;
+      topic.filter('arr[0]', function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(topic.target.arr[0], [2, 4, 6, 8, 10]);
     },
 
-    "can reject from arrays nested within an object and an array": function(topic) {
+    "can filter from arrays nested within an object and an array": function(topic) {
       topic.target = { arr1: [{ arr2: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}] };
-      topic.reject('arr1[0].arr2', function(num) {
-        return num % 2 !== 0;
+      topic.filter('arr1[0].arr2', function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(topic.target.arr1[0].arr2, [2, 4, 6, 8, 10]);
@@ -84,8 +84,8 @@ suite.addBatch({
         invoked2.push(1);
       });
 
-      topic.reject('arr', function(num) {
-        return num % 2 !== 0;
+      topic.filter('arr', function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(invoked1, [1,1]);
@@ -101,8 +101,8 @@ suite.addBatch({
         invoked.push(1);
       });
 
-      topic.reject('arr1[0].arr2', function(num) {
-        return num % 2 !== 0;
+      topic.filter('arr1[0].arr2', function(num) {
+        return num % 2 === 0;
       });
 
       assert.deepEqual(invoked, [1]);
