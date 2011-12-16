@@ -1,3 +1,5 @@
+# This Readme is out of date. I will be updating it shortly
+
 # glue.js
 
 ## The Problem
