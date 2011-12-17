@@ -84,32 +84,6 @@ suite.addBatch({
       assert.equal(invoked2, true);
       assert.equal(invoked3, true);
       assert.equal(invoked4, true);
-    },
-
-    "multiple": function(topic) {
-      var invoked1 = false
-        , invoked2 = false
-        , invoked3 = false;
-
-      topic.target = {v1: '', v2: {v3: ''}};
-
-      topic.addListener('v1', function() {
-        invoked1 = true;
-      });
-
-      topic.addListener('v2', function() {
-        invoked2 = true;
-      });
-
-      topic.addListener('v2.v3', function() {
-        invoked3 = true;
-      });
-
-      topic.notify('v1, v2.v3', { oldValue: '', newValue: 'something' });
-
-      assert.equal(invoked1, true);
-      assert.equal(invoked2, true);
-      assert.equal(invoked3, true);
     }
   },
 
