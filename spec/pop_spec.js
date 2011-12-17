@@ -49,6 +49,18 @@ suite.addBatch({
     }
   },
 
+  "multiple": {
+    topic: new Glue({}),
+
+    "can remove from keys that are inside an array": function(topic) {
+      topic.target = {v1: [1], v2: [2]};
+      var popped = topic.pop('v1, v2');
+
+      assert.deepEqual(topic.target, { v1: [], v2: [] });
+      // assert.deepEqual(popped, [1,2]);
+    }
+  },
+
   "returns": {
     topic: new Glue([]),
 

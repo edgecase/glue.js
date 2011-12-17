@@ -85,6 +85,17 @@ suite.addBatch({
     }
   },
 
+  "multiple": {
+    topic: new Glue({}),
+
+    "can remove from keys that are inside an array": function(topic) {
+      topic.target = {v1: 'value1', v2: 'value2', v3: 'value3'};
+      topic.remove('v1, v2');
+
+      assert.deepEqual(topic.target, { v3: 'value3'});
+    }
+  },
+
   chainability: {
     topic: new Glue([1]),
 
