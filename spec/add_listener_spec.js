@@ -236,9 +236,20 @@ suite.addBatch({
         invoked.push(1);
       });
 
-      topic.set('v1, v2', 2, function() {
-        assert.equal(invoked.length, 2);
+      topic.set('v1, v2', 2);
+      assert.equal(invoked.length, 2);
+    },
+
+    "can set target obj and handler": function(topic) {
+      var obj = {v1: ''};
+      topic.target = {v1: '', v2: ''};
+
+      topic.addListener('v1, v2', obj, function() {
+        obj.v1 = 'set';
       });
+      topic.set('v1, v2', 2);
+
+      assert.equal(obj.v1, 'set');
     },
   },
 
