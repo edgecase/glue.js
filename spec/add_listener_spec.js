@@ -199,6 +199,59 @@ suite.addBatch({
     }
   },
 
+  "elements of collections": {
+    topic: new Glue([]),
+
+    "can listen to individual elements within an array": function(topic) {
+      var message;
+
+      topic.target = [1, 2, 3, 4, 5];
+
+      topic.addListener('[]', function(msg) {
+        message = msg;
+      });
+
+      topic.set('[2]', 9);
+
+      assert.deepEqual(message, {
+          operation: 'set'
+        , oldValue: 3
+        , newValue: 9
+        , index: 2
+      });
+    },
+
+    "notifies per element modified": function(topic) {
+      var removed = [];
+
+      topic.target = [1, 2, 3, 4, 5];
+
+      topic.addListener('[]', function(msg) {
+        removed.push(msg.oldValue);
+      });
+
+      topic.filter(function(num) {
+        return num % 2 === 0;
+      });
+
+      assert.deepEqual(removed, [1, 3, 5]);
+    },
+
+    "can be within an obj": function(topic) {
+      var index;
+
+      topic.target = { v1: [1, 2, 3, 4, 5]};
+
+      topic.addListener('v1[]', function(msg) {
+        index = msg.index;
+      });
+
+      topic.set('v1[2]', 9);
+
+      assert.deepEqual(index, 2);
+    }
+  },
+
   "caching calculated values": {
     topic: new Glue({}),
 
