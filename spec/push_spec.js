@@ -20,7 +20,7 @@ suite.addBatch({
 
       topic.target = [];
 
-      topic.addListener('target', function(msg) {
+      topic.addListener('[]', function(msg) {
         message = msg;
       });
 
@@ -29,6 +29,7 @@ suite.addBatch({
       assert.deepEqual(message, {
           operation: "push"
         , newValue: 2
+        , index: 1
       });
     }
   },

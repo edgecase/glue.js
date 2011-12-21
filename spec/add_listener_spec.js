@@ -249,6 +249,20 @@ suite.addBatch({
       topic.set('v1[2]', 9);
 
       assert.deepEqual(index, 2);
+    },
+
+    "notifies array itself of the change": function(topic) {
+      var index;
+
+      topic.target = { arr: [1, 2, 3, 4, 5]};
+
+      topic.addListener('arr', function(msg) {
+        index = msg.index;
+      });
+
+      topic.set('arr[2]', [1,2,3]);
+
+      assert.deepEqual(index, 2);
     }
   },
 

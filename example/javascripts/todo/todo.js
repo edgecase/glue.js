@@ -4,19 +4,18 @@ var Task = function(desc) {
   this.editMode = false;
 };
 
-var Todo = function() {
+var TodoList = function() {
   this.tasks = [];
 };
 
 $(function() {
-  var tasks = new Glue(new Todo)
-    , g = new Glui(tasks);
+  var mList = new Glue(new TodoList)
+    , vList = new Glui(mList);
 
-  g.$('#new-task').submit(function(data) {
-    this.push('tasks', new Task(data.desc));
+  vList.$('#new-task').submit(function(event, glue, data) {
+    glue.push('tasks', new Task(data.description));
   });
 
-  tasks.addListener('tasks[]', function() {
-  });
+  vlist.addListener('tasks[]', function() {});
 });
 
