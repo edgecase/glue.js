@@ -34,7 +34,7 @@ var suite  = vows.describe('addListener');
 //  to be invoked, newValue is the new value in the target object,
 //  and oldValue is the previous value.
 //
-// Examples
+// Example
 // var glue = new Glue ({ arr = [] })
 //     obj  = {v1: ''};
 //
