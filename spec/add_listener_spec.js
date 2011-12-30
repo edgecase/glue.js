@@ -4,8 +4,11 @@ var vows   = require('vows')
 
 var suite  = vows.describe('addListener');
 
-// Assigns a listner to the target object. Keys are optional. Listners that
-// do not have keys assign are invoked on any changes to the target object.
+// Assigns a listener for the target object. Listners can be assigned to 
+// a key of the target object, and will be triggered when the value of that
+// key is modified. Listeners that are not assigned to a key are invoked when
+// any changes to the target object. This is identical to setting the
+// listener to the any key '*' (see test cases for any key(*)).
 //
 // Usage:
 // glue.addListener([key(s):operation(s)], [context], listener)
@@ -28,7 +31,7 @@ var suite  = vows.describe('addListener');
 //  the function that is to be invoked. The listener is passed a message
 //  object that at minimum looks like this:
 //
-//  { operation: 'push', oldValue: 'bar', newValue: 'foo'}
+//  { operation: 'push', oldValue: 'bar', newValue: 'foo' }
 //
 //  Where operation is the name of the operation that caused that listener
 //  to be invoked, newValue is the new value in the target object,
