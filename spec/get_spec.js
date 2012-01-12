@@ -41,6 +41,20 @@ suite.addBatch({
     }
   },
 
+  "alternate object": {
+    topic: new Glue({v1: 'not this'}),
+
+    "can be specified for a key": function(glue) {
+      var obj = {v1: 'this one'};
+      assert.equal(glue.get('v1', obj), 'this one');
+    },
+
+    "can be specified for an array": function(glue) {
+      var obj = [1, 2, 3];
+      assert.equal(glue.get('[1]', obj), 2);
+    }
+  },
+
   "normalizes keys": {
     topic: new Glue({}),
 
