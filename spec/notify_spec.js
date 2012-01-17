@@ -49,13 +49,13 @@ suite.addBatch({
       assert.deepEqual(message1, {
         operation: 'set',
         oldValue: original,
-        currentValue: current,
+        currentValue: current
       });
 
       assert.deepEqual(message2, {
         operation: 'set',
         oldValue: original,
-        currentValue: current,
+        currentValue: current
       });
     },
 
@@ -76,7 +76,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'set',
         oldValue: 1,
-        currentValue: 2,
+        currentValue: 2
       });
     },
 
@@ -102,7 +102,7 @@ suite.addBatch({
       assert.deepEqual(message1, {
         operation: 'set',
         oldValue: 1,
-        currentValue: 2,
+        currentValue: 2
       });
 
       assert.deepEqual(message2, {});
@@ -131,7 +131,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         currentIndex: 3,
-        currentValue: 1,
+        currentValue: 1
       });
     },
 
@@ -154,7 +154,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         currentIndex: 3,
-        currentValue: 1,
+        currentValue: 1
       });
     },
 
@@ -177,7 +177,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         oldValue: original,
-        currentValue: current,
+        currentValue: current
       });
     }
   },
@@ -204,7 +204,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         currentIndex: 3,
-        currentValue: 1,
+        currentValue: 1
       });
     },
 
@@ -227,7 +227,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         currentIndex: 3,
-        currentValue: 1,
+        currentValue: 1
       });
     },
 
@@ -250,7 +250,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         oldValue: [1, 2, 3],
-        currentValue: [1, 2, 3, 1],
+        currentValue: [1, 2, 3, 1]
       });
     },
 
@@ -273,7 +273,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'push',
         oldValue: { arr: [1, 2, 3] },
-        currentValue: { arr: [1, 2, 3, 1] },
+        currentValue: { arr: [1, 2, 3, 1] }
       });
     }
   },
@@ -298,7 +298,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'set',
         oldValue: '',
-        currentValue: 'a value',
+        currentValue: 'a value'
       });
     },
 
@@ -319,7 +319,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'set',
         oldValue: { v1: { v2: '' }},
-        currentValue: {v1: { v2: 'a value' }},
+        currentValue: {v1: { v2: 'a value' }}
       });
     },
 
@@ -345,7 +345,7 @@ suite.addBatch({
     topic: new Glue({}),
 
     "notified in an element level": function(glue) {
-      var message  = {};
+      var message  = {},
           original = { v1: { arr: [1, 2, 3] }},
           current  = { v1: { arr: [1, 2, 3, 4] }};
 
@@ -363,7 +363,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         currentIndex: 3,
         currentValue: 4,
-        operation: 'push',
+        operation: 'push'
       });
     },
 
@@ -386,7 +386,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         currentIndex: 3,
         currentValue: 4,
-        operation: 'push',
+        operation: 'push'
       });
     },
 
@@ -409,7 +409,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: [ 1, 2, 3 ],
         currentValue: [ 1, 2, 3, 4 ],
-        operation: 'push',
+        operation: 'push'
       });
     },
 
@@ -432,7 +432,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: { arr: [ 1, 2, 3 ] },
         currentValue: { arr: [ 1, 2, 3, 4 ] },
-        operation: 'push',
+        operation: 'push'
       });
     },
 
@@ -455,7 +455,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: { v1: { arr: [ 1, 2, 3 ] } },
         currentValue: { v1: { arr: [ 1, 2, 3, 4 ] } },
-        operation: 'push',
+        operation: 'push'
       });
     },
   },
@@ -482,7 +482,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: '',
         currentValue: 'a value',
-        operation: 'set',
+        operation: 'set'
       });
     },
 
@@ -507,7 +507,7 @@ suite.addBatch({
         currentValue: { v1: 'a value' },
         oldIndex: 0,
         currentIndex: 0,
-        operation: 'set',
+        operation: 'set'
       });
     },
 
@@ -661,13 +661,13 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: { arr: [ 1, 2, 3, 4, 5 ] },
         currentValue: { arr: [ 2, 4 ] },
-        operation: 'filter',
+        operation: 'filter'
       });
     }
   },
 
   "complex nesting (assigned, array, assigned)": {
-    topic: new Glue({ v1: { arr: [ { v2: '' } ]}}),
+    topic: new Glue({}),
 
     "notifies listener of the key specific key": function(glue) {
       var message = {},
