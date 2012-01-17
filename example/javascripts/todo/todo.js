@@ -16,6 +16,8 @@ $(function() {
     glue.push('tasks', new Task(data.description));
   });
 
-  vlist.addListener('tasks[]', function() {});
+  vlist.addListener('tasks[]', 'push,remove', function(msg) {
+    this.render({ description: msg.newValue });
+  });
 });
 

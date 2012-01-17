@@ -1,6 +1,5 @@
 var vows   = require('vows')
 ,   assert = require('assert')
-,   _      = require('underscore')
 ,   Glue   = require(__dirname + "/../lib/glue");
 
 var suite  = vows.describe('notification system');
@@ -26,10 +25,11 @@ var suite  = vows.describe('notification system');
 
 suite.addBatch({
   "assigned (non-nested)": {
-    topic: new Glue({ v1: 1 }),
+    topic: new Glue({}),
 
     "notifies all listeners assigned to any key (*)": function(glue) {
-      var message1 = {}, message2 = {},
+      var message1 = {},
+          message2 = {},
           original = { v1: 1 },
           current  = { v1: 2 };
 
@@ -44,33 +44,23 @@ suite.addBatch({
         message2 = msg;
       });
 
-      glue.notify('v1', 'set', original, current, {
-        'v1': { value: { old: 1, current: 2 }}
-      });
+      glue.notify('set', original, current, [{ old: 'v1', current: 'v1' }]);
 
       assert.deepEqual(message1, {
-        key: 'v1',
         operation: 'set',
         oldValue: original,
         currentValue: current,
-        changes: { 'v1':
-          { value: { old: 1, current: 2 }}
-        }
       });
 
       assert.deepEqual(message2, {
-        key: 'v1',
         operation: 'set',
         oldValue: original,
         currentValue: current,
-        changes: { 'v1':
-          { value: { old: 1, current: 2 }}
-        }
       });
     },
 
     "notifies listeners assigned to the key": function(glue) {
-      var message  = {}
+      var message  = {},
           original = { v1: 1 },
           current  = { v1: 2 };
 
@@ -81,18 +71,12 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1', 'set', original, current, {
-        'v1': { value: { old: 1, current: 2 } }
-      });
+      glue.notify('set', original, current, [{ old: 'v1', current: 'v1' }]);
 
       assert.deepEqual(message, {
-        key: 'v1',
         operation: 'set',
         oldValue: 1,
         currentValue: 2,
-        changes: { 'v1':
-          { value: { old: 1, current: 2 }}
-        }
       });
     },
 
@@ -113,18 +97,12 @@ suite.addBatch({
         message2 = msg;
       });
 
-      glue.notify('v1', 'set', original, current, {
-        'v1': { value: { old: 1, current: 2 } }
-      });
+      glue.notify('set', original, current, [{ old: 'v1', current: 'v1' }]);
 
       assert.deepEqual(message1, {
-        key: 'v1',
         operation: 'set',
         oldValue: 1,
         currentValue: 2,
-        changes: { 'v1':
-          { value: { old: 1, current: 2 }}
-        }
       });
 
       assert.deepEqual(message2, {});
@@ -132,7 +110,7 @@ suite.addBatch({
   },
 
   "array (non-nested)" : {
-    topic: new Glue([1, 2, 3]),
+    topic: new Glue({}),
 
     "notify at an element level": function(glue) {
       var message  = {},
@@ -146,16 +124,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('[3]', 'push', original, current, [
-        { index: { current: '[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: '[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: '[3]',
         operation: 'push',
-        index: 3,
+        currentIndex: 3,
         currentValue: 1,
-        changes: [{ index: { current: '[3]' }, value: { current : 1 } }]
       });
     },
 
@@ -171,16 +147,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('[3]', 'push', original, current, [
-        { index: { current: '[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: '[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: '[3]',
         operation: 'push',
-        index: 3,
+        currentIndex: 3,
         currentValue: 1,
-        changes: [{ index: { current: '[3]' }, value: { current : 1 } }]
       });
     },
 
@@ -196,22 +170,20 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('[3]', 'push', original, current, [
-        { index: { current: '[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: '[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: '[3]',
         operation: 'push',
         oldValue: original,
         currentValue: current,
-        changes: [{ index: { current: '[3]' }, value: { current : 1 } }]
       });
     }
   },
 
   "array (nested)": {
-    topic: new Glue({ arr: [1, 2, 3] }),
+    topic: new Glue({}),
 
     "notifies on an element level": function(glue) {
       var message  = {},
@@ -225,16 +197,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[3]', 'push', original, current, [
-        { index: { current: 'arr[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: 'arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'arr[3]',
         operation: 'push',
-        index: 3,
+        currentIndex: 3,
         currentValue: 1,
-        changes: [{ index: { current: 'arr[3]' }, value: { current: 1 } }]
       });
     },
 
@@ -250,16 +220,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[3]', 'push', original, current, [
-        { index: { current: 'arr[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: 'arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'arr[3]',
         operation: 'push',
-        index: 3,
+        currentIndex: 3,
         currentValue: 1,
-        changes: [{ index: { current: 'arr[3]' }, value: { current: 1 } }]
       });
     },
 
@@ -275,16 +243,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[3]', 'push', original, current, [
-        { index: { current: 'arr[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: 'arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'arr[3]',
         operation: 'push',
         oldValue: [1, 2, 3],
         currentValue: [1, 2, 3, 1],
-        changes: [{ index: { current: 'arr[3]' }, value: { current: 1 } }]
       });
     },
 
@@ -300,22 +266,20 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[3]', 'push', original, current, [
-        { index: { current: 'arr[3]' }, value: {  current: 1 } }
+      glue.notify('push', original, current, [
+        { current: 'arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'arr[3]',
         operation: 'push',
         oldValue: { arr: [1, 2, 3] },
         currentValue: { arr: [1, 2, 3, 1] },
-        changes: [ { index: { current: 'arr[3]' }, value: {  current: 1 } } ]
       });
     }
   },
 
   "assigned (nested)": {
-    topic: new Glue({ v1: { v2: '' }}),
+    topic: new Glue({}),
 
     "invokes listeners of that key": function(glue) {
       var message  = {},
@@ -329,18 +293,12 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.v2', 'set', original, current, { 'v1.v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [{ old: 'v1.v2', current: 'v1.v2' }]);
 
       assert.deepEqual(message, {
-        key: 'v1.v2',
         operation: 'set',
         oldValue: '',
         currentValue: 'a value',
-        changes: { 'v1.v2' :
-          { value: { old: '' , current: 'a value' }}
-        }
       });
     },
 
@@ -356,18 +314,12 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.v2', 'set', original, current, { 'v1.v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [{ old: 'v1.v2', current: 'v1.v2' }]);
 
       assert.deepEqual(message, {
-        key: 'v1.v2',
         operation: 'set',
         oldValue: { v1: { v2: '' }},
         currentValue: {v1: { v2: 'a value' }},
-        changes: { 'v1.v2' :
-          { value: { old: '' , current: 'a value' }}
-        }
       });
     },
 
@@ -383,16 +335,14 @@ suite.addBatch({
         invocations.push(1);
       });
 
-      glue.notify('v1.v2', 'set', original, current, { 'v1.v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [{ old: 'v1.v2', current: 'v1.v2' }]);
 
       assert.deepEqual(invocations, [1]);
     },
   },
 
   "assigned and array combination (nested)": {
-    topic: new Glue({ v1: { arr: [1, 2, 3] }}),
+    topic: new Glue({}),
 
     "notified in an element level": function(glue) {
       var message  = {};
@@ -406,19 +356,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.arr[3]' }, value: { current: 4 } }
+      glue.notify('push', original, current, [
+        { current: 'v1.arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'v1.arr[3]',
-        index: 3,
+        currentIndex: 3,
         currentValue: 4,
         operation: 'push',
-        changes: [{
-          index: { current: 'v1.arr[3]' },
-          value: { current: 4 }
-        }]
       });
     },
 
@@ -434,19 +379,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.arr[3]' }, value: { current: 4 } }
+      glue.notify('push', original, current, [
+        { current: 'v1.arr[3]' }
       ]);
 
       assert.deepEqual(message, {
-        key: 'v1.arr[3]',
-        index: 3,
+        currentIndex: 3,
         currentValue: 4,
         operation: 'push',
-        changes: [{
-          index: { current: 'v1.arr[3]' },
-          value: { current: 4 }
-        }]
       });
     },
 
@@ -462,16 +402,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.arr[3]' }, value: { current: 4 } }
+      glue.notify('push', original, current, [
+        { current: 'v1.arr[3]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: [ 1, 2, 3 ],
         currentValue: [ 1, 2, 3, 4 ],
         operation: 'push',
-        key: 'v1.arr[3]',
-        changes: [ { index: { current: 'v1.arr[3]' }, value: { current: 4 } } ]
       });
     },
 
@@ -487,16 +425,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.arr[3]' }, value: { current: 4 } }
+      glue.notify('push', original, current, [
+        { current: 'v1.arr[3]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: { arr: [ 1, 2, 3 ] },
         currentValue: { arr: [ 1, 2, 3, 4 ] },
         operation: 'push',
-        key: 'v1.arr[3]',
-        changes: [ { index: { current: 'v1.arr[3]' }, value: { current: 4 } } ]
       });
     },
 
@@ -512,22 +448,20 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.arr[3]' }, value: { current: 4 } }
+      glue.notify('push', original, current, [
+        { current: 'v1.arr[3]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: { v1: { arr: [ 1, 2, 3 ] } },
         currentValue: { v1: { arr: [ 1, 2, 3, 4 ] } },
         operation: 'push',
-        key: 'v1.arr[3]',
-        changes: [ { index: { current: 'v1.arr[3]' }, value: { current: 4 } } ]
       });
     },
   },
 
   "array and assigned combination (nested)": {
-    topic: new Glue({ arr: [ {v1: ''} ]}),
+    topic: new Glue({}),
 
     "notifies listener of that key": function(glue) {
       var message = {},
@@ -541,16 +475,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[0].v1', 'set', original, current, { 'arr[0].v1':
-        { value: { old: '', current: 'a value' } }
-      });
+      glue.notify('set', original, current, [{
+        old: 'arr[0].v1', current: 'arr[0].v1'
+      }]);
 
       assert.deepEqual(message, {
         oldValue: '',
         currentValue: 'a value',
         operation: 'set',
-        key: 'arr[0].v1',
-        changes: { 'arr[0].v1': { value: { current: 'a value', old: '' } } }
       });
     },
 
@@ -566,16 +498,16 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[0].v1', 'set', original, current, { 'arr[0].v1':
-        { value: { old: '', current: 'a value' } }
-      });
+      glue.notify('set', original, current, [{
+        old: 'arr[0].v1', current: 'arr[0].v1'
+      }]);
 
       assert.deepEqual(message, {
         oldValue: { v1: '' },
         currentValue: { v1: 'a value' },
+        oldIndex: 0,
+        currentIndex: 0,
         operation: 'set',
-        key: 'arr[0].v1',
-        changes: { 'arr[0].v1': { value: { current: 'a value', old: '' } } }
       });
     },
 
@@ -591,16 +523,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[0].v1', 'set', original, current, { 'arr[0].v1':
-        { value: { old: '', current: 'a value' } }
-      });
+      glue.notify('set', original, current, [{
+        old: 'arr[0].v1', current: 'arr[0].v1'
+      }]);
 
       assert.deepEqual(message, {
-        oldValue: [{ v1: '' }],
-        currentValue: [{ v1: 'a value' }],
-        operation: 'set',
-        key: 'arr[0].v1',
-        changes: { 'arr[0].v1': { value: { current: 'a value', old: '' } } }
+        oldValue: [ { v1: '' } ],
+        currentValue: [ { v1: 'a value' } ],
+        operation: 'set'
       });
     },
 
@@ -616,26 +546,24 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('arr[0].v1', 'set', original, current, { 'arr[0].v1':
-        { value: { old: '', current: 'a value' } }
-      });
+      glue.notify('set', original, current, [{
+        old: 'arr[0].v1', current: 'arr[0].v1'
+      }]);
 
       assert.deepEqual(message, {
         oldValue: { arr: [ { v1: '' } ] },
         currentValue: { arr: [ { v1: 'a value' } ] },
-        operation: 'set',
-        key: 'arr[0].v1',
-        changes: { 'arr[0].v1': { value: { current: 'a value', old: '' } } }
+        operation: 'set'
       });
     }
   },
 
   "a single operations that have multiple side effects": {
-    topic: new Glue({ v1: { arr: [1, 2, 3, 4, 5] }}),
+    topic: new Glue({}),
 
     "notifies listener on a specific index": function(glue) {
-      var message = {};
-          original = { v1: { arr: [1, 2, 3, 4, 5] }};
+      var message = {},
+          original = { v1: { arr: [1, 2, 3, 4, 5] }},
           current = { v1: { arr: [2, 4] }};
 
       glue.target = current;
@@ -645,29 +573,20 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr', 'filter', original, current, [
-        { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-        { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-        { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
+      glue.notify('filter', original, current, [
+        { old: 'v1.arr[4]' }, { old: 'v1.arr[2]' }, { old: 'v1.arr[0]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: 1,
-        currentValue: 2,
-        index: 0,
-        operation: 'filter',
-        key: 'v1.arr',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
+        oldIndex: 0,
+        operation: 'filter'
       });
     },
 
     "notifies listener on an element level": function(glue) {
-      var messages = [];
-          original = { v1: { arr: [1, 2, 3, 4, 5] }};
+      var messages = [],
+          original = { v1: { arr: [1, 2, 3, 4, 5] }},
           current = { v1: { arr: [2, 4] }};
 
       glue.target = current;
@@ -677,53 +596,32 @@ suite.addBatch({
         messages.push(msg);
       });
 
-      glue.notify('v1.arr', 'filter', original, current, [
-        { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-        { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-        { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
+      glue.notify('filter', original, current, [
+        { old: 'v1.arr[4]' }, { old: 'v1.arr[2]' }, { old: 'v1.arr[0]' }
       ]);
 
       assert.deepEqual(messages[0], {
         oldValue: 5,
-        index: 4,
-        operation: 'filter',
-        key: 'v1.arr',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
+        oldIndex: 4,
+        operation: 'filter'
       });
 
       assert.deepEqual(messages[1], {
         oldValue: 3,
-        index: 2,
-        operation: 'filter',
-        key: 'v1.arr',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
+        oldIndex: 2,
+        operation: 'filter'
       });
 
       assert.deepEqual(messages[2], {
         oldValue: 1,
-        currentValue: 2,
-        index: 0,
-        operation: 'filter',
-        key: 'v1.arr',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
+        oldIndex: 0,
+        operation: 'filter'
       });
     },
 
     "notifies listener on a collection level": function(glue) {
-      var messages = [];
-          original = { v1: { arr: [1, 2, 3, 4, 5] }};
+      var messages = [],
+          original = { v1: { arr: [1, 2, 3, 4, 5] }},
           current = { v1: { arr: [2, 4] }};
 
       glue.target = current;
@@ -733,28 +631,20 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr', 'filter', original, current, [
-        { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-        { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-        { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
+      glue.notify('filter', original, current, [
+        { old: 'v1.arr[4]' }, { old: 'v1.arr[2]' }, { old: 'v1.arr[0]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: [ 1, 2, 3, 4, 5 ],
         currentValue: [ 2, 4 ],
-        operation: 'filter',
-        key: 'v1.arr',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
+        operation: 'filter'
       });
     },
 
     "notifies listener on a collection level": function(glue) {
-      var messages = [];
-          original = { v1: { arr: [1, 2, 3, 4, 5] }};
+      var message = {},
+          original = { v1: { arr: [1, 2, 3, 4, 5] }},
           current = { v1: { arr: [2, 4] }};
 
       glue.target = current;
@@ -764,22 +654,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr', 'filter', original, current, [
-        { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-        { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-        { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
+      glue.notify('filter', original, current, [
+        { old: 'v1.arr[4]' }, { old: 'v1.arr[2]' }, { old: 'v1.arr[0]' }
       ]);
 
       assert.deepEqual(message, {
         oldValue: { arr: [ 1, 2, 3, 4, 5 ] },
         currentValue: { arr: [ 2, 4 ] },
-        key: 'v1.arr',
         operation: 'filter',
-        changes: [
-          { index: { old: 'v1.arr[4]' }, value: { old: 5 } },
-          { index: { old: 'v1.arr[2]' }, value: { old: 3 } },
-          { index: { old: 'v1.arr[0]' }, value: { old: 1 } }
-        ]
       });
     }
   },
@@ -788,7 +670,7 @@ suite.addBatch({
     topic: new Glue({ v1: { arr: [ { v2: '' } ]}}),
 
     "notifies listener of the key specific key": function(glue) {
-      var message = {};
+      var message = {},
           original = { v1: { arr: [ { v2: '' } ]}},
           current = { v1: { arr: [ { v2: 'a value' } ]}};
 
@@ -796,25 +678,19 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
+      ]);
 
       assert.deepEqual(message, {
         oldValue: '',
         currentValue: 'a value',
-        operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: {
-            'v1.arr[0].v2': {
-                value: { current: 'a value', old: '' }
-            }
-        }
+        operation: 'set'
       })
     },
 
     "notifies listener of the parent array at a specific index": function(glue) {
-      var message = {};
+      var message = {},
           original = { v1: { arr: [ { v2: '' } ]}},
           current = { v1: { arr: [ { v2: 'a value' } ]}};
 
@@ -822,25 +698,21 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
+      ]);
 
       assert.deepEqual(message, {
         oldValue: { v2: '' },
-        currentValue:  { v2: 'a value' },
-        operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: {
-            'v1.arr[0].v2': {
-                value: { current: 'a value', old: '' }
-            }
-        }
+        currentValue: { v2: 'a value' },
+        oldIndex: 0,
+        currentIndex: 0,
+        operation: 'set'
       })
     },
 
     "notifies listener of the parent array at an element level": function(glue) {
-      var message = {};
+      var message = {},
           original = { v1: { arr: [ { v2: '' } ]}},
           current = { v1: { arr: [ { v2: 'a value' } ]}};
 
@@ -848,25 +720,21 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
+      ]);
 
       assert.deepEqual(message, {
         oldValue: { v2: '' },
-        currentValue:  { v2: 'a value' },
+        currentValue: { v2: 'a value' },
+        oldIndex: 0,
         operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: {
-            'v1.arr[0].v2': {
-                value: { current: 'a value', old: '' }
-            }
-        }
+        currentIndex: 0
       })
     },
 
     "notifies listener of the parent array at the collection level": function(glue) {
-      var message = {};
+      var message = {},
           original = { v1: { arr: [ { v2: '' } ]}},
           current = { v1: { arr: [ { v2: 'a value' } ]}};
 
@@ -874,17 +742,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
+      ]);
 
       assert.deepEqual(message, {
         oldValue: [ { v2: '' } ],
         currentValue: [ { v2: 'a value' } ],
-        operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: { 'v1.arr[0].v2': { value: { current: 'a value', old: '' } }
-        }
+        operation: 'set'
       });
     },
 
@@ -897,17 +762,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
+      ]);
 
       assert.deepEqual(message, {
         oldValue: { arr: [ { v2: '' } ] },
         currentValue: { arr: [ { v2: 'a value' } ] },
-        operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: { 'v1.arr[0].v2': { value: { current: 'a value', old: '' } }
-        }
+        operation: 'set'
       });
     },
 
@@ -920,183 +782,14 @@ suite.addBatch({
         message = msg;
       });
 
-      glue.notify('v1.arr[0].v2', 'set', original, current, { 'v1.arr[0].v2':
-        { value: { old: '', current: 'a value' }}
-      });
-
-      assert.deepEqual(message, {
-        oldValue: { v1: { arr: [ { v2: '' } ] }},
-        currentValue: { v1: { arr: [ { v2: 'a value' } ] }},
-        operation: 'set',
-        key: 'v1.arr[0].v2',
-        changes: { 'v1.arr[0].v2': { value: { current: 'a value', old: '' } }
-        }
-      });
-    }
-  },
-
-  "complex nesting (assigned, assigned, array)": {
-    topic: new Glue({ v1: { v2: { arr: [1, 2, 3] }}}),
-
-    "notifies listener on a specific index": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('v1.v2.arr[3]', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
+      glue.notify('set', original, current, [
+        { old: 'v1.arr[0].v2', current: 'v1.arr[0].v2' }
       ]);
 
       assert.deepEqual(message, {
-        currentValue: 4,
-        index: 3,
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
-      });
-    },
-
-    "notifies at an element level": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('v1.v2.arr[]', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
-      ]);
-
-      assert.deepEqual(message, {
-        currentValue: 4,
-        index: 3,
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
-      });
-    },
-
-    "notifies at a collection level": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('v1.v2.arr', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
-      ]);
-
-      assert.deepEqual(message, {
-        oldValue: [ 1, 2, 3 ],
-        currentValue: [ 1, 2, 3, 4 ],
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
-      });
-    },
-
-    "notifies parent key": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('v1.v2', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
-      ]);
-
-      assert.deepEqual(message, {
-        oldValue: { arr: [ 1, 2, 3 ] },
-        currentValue: { arr: [ 1, 2, 3, 4 ] },
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
-      });
-  },
-
-    "notifies all the way to the root key": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('v1', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
-      ]);
-
-      assert.deepEqual(message, {
-        oldValue: { v2: { arr: [ 1, 2, 3 ] } },
-        currentValue: { v2: { arr: [ 1, 2, 3, 4 ] } },
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
-      });
-    },
-
-    "notifies keys on any key (*)": function(glue) {
-      var message = {};
-          original = { v1: { v2: { arr: [1, 2, 3] }}};
-          current = { v1: { v2: { arr: [1, 2, 3, 4] }}};
-
-      glue.target = current;
-      glue.resetListeners();
-
-      glue.addListener('*', message, function(msg) {
-        message = msg;
-      });
-
-      glue.notify('v1.v2.arr[3]', 'push', original, current, [
-        { index: { current: 'v1.v2.arr[3]' }, value: {  current: 4 } }
-      ]);
-
-      assert.deepEqual(message, {
-        oldValue: { v1: { v2: { arr: [ 1, 2, 3 ] } } },
-        currentValue: { v1: { v2: { arr: [ 1, 2, 3, 4 ] } } },
-        operation: 'push',
-        key: 'v1.v2.arr[3]',
-        changes: [
-          { index: { current: 'v1.v2.arr[3]' }, value: { current: 4 } }
-        ]
+        oldValue: { v1: { arr: [ { v2: '' } ] } },
+        currentValue: { v1: { arr: [ { v2: 'a value' } ] } },
+        operation: 'set'
       });
     }
   }
