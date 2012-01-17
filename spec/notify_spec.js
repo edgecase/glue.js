@@ -179,7 +179,30 @@ suite.addBatch({
         oldValue: original,
         currentValue: current
       });
-    }
+    },
+
+    "notifies calculated value if changed": function(glue) {
+      var message = {},
+          original = [1, 2, 3],
+          current  = [1, 2, 3, 1];
+
+      glue.target = current;
+      glue.resetListeners();
+
+      glue.addListener('#length', function(msg) {
+        message = msg;
+      });
+
+      glue.notify('push', original, current, [
+        { current: '[3]' }
+      ]);
+
+      assert.deepEqual(message, {
+        operation: 'push',
+        oldValue: 3,
+        currentValue: 4
+      });
+    },
   },
 
   "array (nested)": {
