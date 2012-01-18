@@ -34,9 +34,9 @@ the value of `v1` changed.
 `targetObject`: the object that will be observe by `Glue`.
 
 ####addListener
-    glue.addListener([key:operation(s)], [context], callback);
+    glue.addListener([key(s):operation(s)], [context], callback);
 
-`key` (optional): specifies the key or index the callback listens to. Defaults to any key, explicitly defined with ('*'), if the key is not specified.
+`key(s)` (optional): specifies the key or index the callback listens to. Defaults to any key, explicitly defined with ('*'), if the key is not specified.
 
 `operation(s)` (optional): restricts the callback to only trigger on a particular operation. (push, pop, etc.)
 
@@ -127,14 +127,14 @@ Note that generic element keys can only be specified if it at the end of the key
 #####Operation(s)
 All keys can be restricted to only execute for a particular operation. For example:
 
-    glue.addListener('v1:[set]', function(message) {
+    glue.addListener('v1:set', function(message) {
       // callback
     });
 
 Will only be executed if the change on `v1` resulted from a `set` operation. Multiple
 operation can be specified for a listener.
 
-    glue.addListener('v1:[set, push, insert]', function(message) {
+    glue.addListener('v1:set, push, insert', function(message) {
       // callback
     });
 
@@ -164,6 +164,7 @@ The example below demonstrates context.
     glue.set('v1', 'Hello');
 
     console.log(context); // { myWord: 'Hello' }
+
 
 
 ####removeListener
