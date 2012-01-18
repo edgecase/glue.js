@@ -1,232 +1,149 @@
-# This Readme is out of date. I will be updating it shortly
+# Working on this documentation as we speak.
 
 # glue.js
 
-## The Problem
-
-Say you have a JS object -- let's call it a "view". You want it to react in 
-some way whenever a property is modified on some other object -- let's call it 
-a "model" -- and you don't want the model to worry about who is watching it. It 
-would be super nice if the view could know what was modified in the model 
-without having to dive into the models object graph.
-
-
-## The Solution
-
-Introduce a third object -- Glue. Glue is responsible for 
-brokering any messages from the model to any other object who wants to receive 
-messages.
-
+## Overview
+`glue.js` is a general purpose hash and array observer for Javascript. It
+gives users the ability to register a callback that are executed when a
+particular change occurs to the target object.
 
 ## Example
-Let's say you have a project that uses jQuery, with the following markup.
+Given an the following `target` object:
 
-    <input type='text' id='the-word'></input>
-    <div id='my-word'></div>
-    <div id='my-word-length'></div>
+    var targetObject = { v1: '' };
 
-You also have a `model` object.
+The `target` object can be passed to the Glue constructed creating an instance
+of `Glue`.
 
-    var model = {
-      myString: '',
-      myStringSize: function() {
-        return this.myString.length;
-      }
-    };
+    var glue = new Glue(targetObject);
 
-Now let's wire it all up using `Glue`.
-
-    var controller    = new Glue(model),
-        $myWord       = $('#my-word'),
-        $myWordLength = $('#my-word-length');
-
-    controller.addListener($myWord, "myString", function(msg) {
-      this.html(msg.value);
+    glue.addListener(function() {
+      console.log('Target object changed.');
     });
 
-    controller.addListener($myWordLength, "myStringSize()", function(msg) {
-      this.html(msg.value);
-    });
+    glue.set('v1', 'a value'); // 'Target object changed.'
 
-    $('input#the-word').change(function() {
-      controller.set('myString', $(this).val());
-    });
-
-Now everytime the user types into the text field `$myWord` and `$myWordLength` will be
-updated.
+In the example above, `"Target object changed."` is logged into the console when
+the value of `v1` changed.
 
 ## API
+### Core methods
+####contructor
+    new Glue(targetObject);
 
-### Constructor
-Glue is responsible for managing the state of particular object "aka: the `boundObject`"
-Observers register themselves with Glue and will be notified when the object's state 
-modified in the scope of their `keyPath`.
+`targetObject`: the object that will be observe by `Glue`.
 
-    new Glue(obj);
+####addListener
+    glue.addListener([key:operation(s)], [context], callback);
 
-Creates a new Glue instance. `obj` can be any valid JavaScript object (though, observing a 
-Function Object will not get you very far...) -- a DOM element, a jQuery object, a Backbone 
-model, a vanilla JS object, JS arrays, JS literals, etc.
+`key` (optional): specifies the key or index the callback listens to. Defaults to any key, explicitly defined with ('*'), if the key is not specified.
 
-### addListener
-    addListener([listener, ] [keyPath, ] callback);
+`operation(s)` (optional): restricts the callback to only trigger on a particular operation. (push, pop, etc.)
 
-Will notify the `listener` when `keyPath` is modified on the source object. `keyPath` uses 
-dot notation to dive into the object graph. `observer` can be any JS object. `callback` 
-is executed in the context of the `boundObject` and passed an argument that contains 
-the old, and new value of the attribute specified by the `keyPath`.
+`context` (optional): the context which the callback is to be executed. By default callbacks are executed within the context of the `target` object.
 
-#### Sample Usage
-    glue.addListener(function(msg) {
+`callback`: the function to be executed when the listener is notified.
+
+#####Explanation of Keys
+Assume the following is the target object.
+
+    var target1 = [];
+
+Keys can be specified on 3 different levels – element, generic element, and collection level.
+
+    glue.addListener('[0]', function(message) {
       // callback
     });
 
-    glue.addListener(function(msg) {
-      // callback
-    }, 'keyPath');
+The listener above would be invoked when the value at index `0` is modified. If a user
+wants to listen for changes on an element on generically the following can be specified.
 
-    glue.addListener(anObject, function(msg) {
-      // callback
-    });
-
-    topic.addListener(anObject, 'keyPath', function(msg) {
+    glue.addListener('[]', function(message) {
       // callback
     });
 
-#### listener (optional)
-Whenever a listener is added to an instance of Glue, it is assigned to a `keyPath`, which 
-indicates to Glue how to access the attribute the listener wants to be notified 
-about.
+The message to the callback above is identical to the first example, the listener is generically
+bound to the array.
 
-For example, lets say you have `var fooObject = {foo: 'object'}` which was passed to
-`new Glue(fooObject)`, if you add a listener such as this:
+To listen to the array on a collection level the following can be used:
 
-    glue.addListener({my: 'listener'}, "foo", function() {
-      // the callback
+    glue.addListener(function(message) {
+      // callback
     });
 
-Whenever the key `foo` is modified, the callback of will be executed.
+    // --------------- or ---------------- //
 
-#### keyPath (optional)
-A `keyPath` is a string that indicates to glue how to access an attribute of the `boundObject`.
-
-For example, let's say you have:
-  var obj = {
-    foo: 'this is great'
-  }
-
-The `keyPath` for `foo` would be `'foo'`.
-
-`keyPath`s can be chained (ex `'foo.bar'`);
-
-`keyPath`s can be calculated and function attributes.
-
-Let's say you have `var anObject = {foo: "string"}`. This means that `anObject.foo` has a 
-calculated attribute `length`. The keyPath for `foo`'s length would be `foo.(length)`.
-
-On the other hand let's say that you have:
-
-    var anObject = {
-      foo: "string",
-      fooLength: function() {
-        this.foo.length
-      }
-    }
-
-You can listen to `fooLength()` with the keyPath `fooLength()`.
-
-If a `keyPath` is not passed it is assigned to the `'*'`
-`keyPath`, which will notify a listener whenever any attribute is set or modified on the
-boundObject.
-
-#### Note
-If a `keyPath` is pointing to a calculated attribute or a function, they must be pure 
-functions. Augmentations to the `boundObject` object that resulted from the invocation of
-a non-pure `keyPath` could be unreported to listeners.
-
-#### callback
-The `callback` is the function that is executed when a the listener is notified by glue.
-All `callback`s are invoked in the context of the listener object, meaning that `this` 
-inside the `callback` is the listener object.
-
-For example:
-
-    var anObject = {bar: 'listener'};
-
-    glue.addListener(anObject, "foo", function() {
-      this.bar; // this is anObject, and this.bar is equivalent to anObject.bar
+    glue.addListener('*', function(message) {
+      // callback
     });
 
-`callback`s are also passed a message argument that contains the old and new value of 
-the attribute specified by the `keyPath`.
+The message passed to the callback would pertain to changes on the entire array rather than on an element level.
 
-    glue.addListener({an: 'object'}, 'foo' function(msg) {
-      msg.oldValue; // this is the old value of the attribute specified by the keyPath on the boundObject
-      msg.value; // this is the new value of the attribute specified by the keyPath on the boundObject
+Arrays can be nested within an object. For example:
+
+    var target2 = { arr: [] };
+
+The following can be specified:
+
+    glue.addListener('arr[0]', function(message) {
+      // callback
     });
 
-### set('keyPath', newValue)
-Sets a property on the `boundObject` specified by the `keyPath`, and notifies `boundObject`s that
-the value of the attribute has changed.
-
-    var glue = new Glue({level1: {level2: ''}})
-      , callbackInvoked = false;
-
-    glue.addListener(function() {
-      callbackInvoked = true;
+    glue.addListener('arr[]', function(message) {
+      // callback
     });
 
-    glue.set('level1.level2', 'two levels');
-    // => glue.getBoundObject().level1.level2 === "two levels"
-    // => callbackInvoked === true
-
-### get('keyPath', newValue)
-Gets a property on the `boundObject` specified by the `keyPath`.
-
-    var topic = new Glue({
-      foo: {
-        bar: function() {
-          return { baz: 3 }
-        }
-      }
+    glue.addListener('arr', function(message) {
+      // callback
     });
 
-    topic.get("foo.bar().baz");
-    // => 3
+The last example above also demonstrates that listeners can specified for a key in a hash. For example:
 
-### getBoundObject()
-Returns a clone of the bound object
+    var target3 = { v1: '' };
 
-    var controller = new Glue({foo: 1}),
-        boundObject = controller.getBoundObject();
+Can have the following listener:
 
-    // => boundObject.foo === 1;
+    glue.addListener('v1', function(message) {
+      // callback
+    });
 
-### removeListener([[boundObject,] keypath, ] [keyPath, ])
-Removes listener(s) to the `boundObject` on the a `Glue` instance.
+Finally, keys can be nested within a hash of arbitrary complexity:
 
-#### Sample Usages
-    glue.removeListener();
+    var target5 = { v1: { arr1: [ { v2: { arr2: [ 'something' ] } } ] } };
 
-    glue.removeListener(anObject);
+`target5` can have the following keys:
+    'v1.arr1[0].v2.arr2[0]', 'v1.arr1[0].v2.arr2[]', 'v1.arr1[0].v2.arr2', 'v1.arr1[0].v2', 'v1.arr1[0]', 'v1.arr1[]', 'v1.arr1', 'v1', '*'
 
-    glue.removeListener(anObject, "bar()");
+Note that generic element keys can only be specified if it at the end of the key.
 
-    glue.removeListener({keyPath: "bar()"});
+#####Usage
+Callback will be executed if any `Glue` operation is performed on the `target` object.
 
-### bindTo(objectToObserve)
+    glue.addListener(function(message) {
+      // callback
+    });
 
-When you pass an object instance to the `Glue`'s construtor, you are, in effect, calling
-the `bindTo` function. It establishes the object that `Glue` is managing. This value 
-can be set at anytime but be aware of the implecations of doing so. The observers are NOT 
-removed from the `glue` instance when bindTo is invoked and it's incumbant upon the caller to 
-either remove them or not.
 
-You can add a listener to the `keyPath` of the `boundObject` and assign a `callback` to 
-handle the change.
+This is identical to the example above. This explicitly defines to trigger on any (*) change.
 
-Example:
-    glue.addListener(function() {
-      // your callback
-    }, "boundObject");
+    glue.addListener('*', function(message) {
+      // callback
+    });
+    });
 
+    glue.addListener('*', function() {
+      // callback
+    });
+
+####removeListener
+    glue.addListener(key(s):operation(s)), [context]);
+
+    operation(s)
+
+### Operations
+push (documentation needed)
+pop (documentation needed)
+insert (documentation needed)
+filter (documentation needed)
+set (documentation needed)
+remove (documentation needed)
