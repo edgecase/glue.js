@@ -44,7 +44,7 @@ the value of `v1` changed.
 
 `callback`: the function to be executed when the listener is notified.
 
-#####Explanation of Keys
+#####Keys
 Assume the following is the target object.
 
     var target1 = [];
@@ -112,28 +112,59 @@ Finally, keys can be nested within a hash of arbitrary complexity:
     var target5 = { v1: { arr1: [ { v2: { arr2: [ 'something' ] } } ] } };
 
 `target5` can have the following keys:
-    'v1.arr1[0].v2.arr2[0]', 'v1.arr1[0].v2.arr2[]', 'v1.arr1[0].v2.arr2', 'v1.arr1[0].v2', 'v1.arr1[0]', 'v1.arr1[]', 'v1.arr1', 'v1', '*'
+    'v1.arr1[0].v2.arr2[0]',
+    'v1.arr1[0].v2.arr2[]',
+    'v1.arr1[0].v2.arr2',
+    'v1.arr1[0].v2',
+    'v1.arr1[0]',
+    'v1.arr1[]',
+    'v1.arr1',
+    'v1',
+    '*'
 
 Note that generic element keys can only be specified if it at the end of the key.
 
-#####Usage
-Callback will be executed if any `Glue` operation is performed on the `target` object.
+#####Operation(s)
+All keys can be restricted to only execute for a particular operation. For example:
 
-    glue.addListener(function(message) {
+    glue.addListener('v1:[set]', function(message) {
       // callback
     });
 
+Will only be executed if the change on `v1` resulted from a `set` operation. Multiple
+operation can be specified for a listener.
 
-This is identical to the example above. This explicitly defines to trigger on any (*) change.
-
-    glue.addListener('*', function(message) {
+    glue.addListener('v1:[set, push, insert]', function(message) {
       // callback
     });
-    });
 
-    glue.addListener('*', function() {
+#####Context
+The a user's callback will be executed in the `context` of the `target` object, but can be specified by following:
+
+    glue.addListener(context, function(message) {
       // callback
     });
+
+Or for a specific key like so:
+
+    glue.addListener('v1', context, function(message) {
+      // callback
+    });
+
+The example below demonstrates context.
+
+    var context = { myWord: 'Oh my' },
+        target = { v1: '' },
+        glue = new Glue(target);
+
+    glue.addListener(context, function(message) {
+      this.myWord = message.currentValue;
+    });
+
+    glue.set('v1', 'Hello');
+
+    console.log(context); // { myWord: 'Hello' }
+
 
 ####removeListener
     glue.addListener(key(s):operation(s)), [context]);
