@@ -8,8 +8,17 @@ suite.addBatch({
   "target obj": {
     topic: new Glue([]),
 
-    "get with empty key returns the target obj": function(glue) {
+    "get with empty key returns the target array": function(glue) {
       var target = [1,2,3,4];
+      glue.target = target;
+
+      var obj = glue.get('');
+
+      assert.equal(obj, glue.target);
+    },
+
+    "get with empty key returns the target obj": function(glue) {
+      var target = {v1: 'obj'};
       glue.target = target;
 
       var obj = glue.get('');
