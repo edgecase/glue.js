@@ -8,21 +8,18 @@
 //   "current test": {
 //     topic: new Glue ({ v1: { arr: [ { v2: '' } ]}}),
 // 
-//     "notifies listener of that key": function(topic) {
+//     "notifies listeners that the value has been removed": function(topic) {
 //       var message;
 // 
-//       topic.target = { arr: [] };
+//       topic.target = {v1: 'value'};
 // 
-//       topic.addListener('arr', function(msg) {
+//       topic.addListener('v1', function(msg) {
 //         message = msg;
 //       });
 // 
-//       topic.push('arr', 2);
+//       topic.remove('v1');
 // 
-//       assert.deepEqual(message, {
-//         operation: "push",
-//         newValue: 2
-//       });
+//       assert.deepEqual(message, { operation: 'remove', oldValue: 'value' });
 //     }
 //   }
 // });
