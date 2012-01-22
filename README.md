@@ -1,4 +1,4 @@
-# Working on this documentation as we speak.
+  # Working on this documentation as we speak.
 
 # glue.js
 
@@ -124,6 +124,11 @@ Finally, keys can be nested within a hash of arbitrary complexity:
 
 Note that generic element keys can only be specified if it at the end of the key.
 
+Multiple keys can be added simultaneously:
+
+    glue.addListener('v1, v2', callback);
+
+
 #####Operation(s)
 All keys can be restricted to only execute for a particular operation. For example:
 
@@ -165,7 +170,7 @@ The example below demonstrates context.
 
     console.log(context); // { myWord: 'Hello' }
 
-
+#####Message
 
 ####removeListener
     glue.addListener(key(s):operation(s)), [context]);

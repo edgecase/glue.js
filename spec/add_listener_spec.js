@@ -50,164 +50,203 @@ var suite  = vows.describe('addListener');
 // is obj. If this listener is executed the value obj.v1 will be msg.newValue.
 
 suite.addBatch({
-  "any key (*)": {
+  "specific": {
     topic: new Glue({}),
 
-    "implicitly assigned": function(glue) {
+    "implicitly assigned to any key": function(glue) {
       var callback = function(){};
       glue.resetListeners();
-
       glue.addListener(callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: glue.target
-      }]);
+
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: [],
+          context: glue.target
+        }]
+      });
     },
 
-    "assigned explicitly with '*' key": function(glue) {
+    "assigned explicitly to any key with '*' key": function(glue) {
       var callback = function(){};
       glue.resetListeners();
-
       glue.addListener('*', callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: glue.target
-      }]);
+
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: [],
+          context: glue.target
+        }]
+      });
     },
 
-    "assigned along with operation restriction (implicit)": function(glue) {
+    "implicitly assigned to any key along with operation restriction": function(glue) {
       var callback = function(){};
       glue.resetListeners();
 
       glue.addListener(':filter', callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: glue.target,
-        operations: ['filter']
-      }]);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: ['filter'],
+          context: glue.target
+        }]
+      });
     },
 
-    "assigned along with operation restriction (explicit)": function(glue) {
+    "implicitly assigned to any key along with multiple operation restrictions": function(glue) {
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener('*:filter', callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: glue.target,
-        operations: ['filter']
-      }]);
+      glue.addListener(':set,push', callback);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: ['set', 'push'],
+          context: glue.target
+        }]
+      });
     },
 
-    "assigned along with multiple operation restrictions": function(glue) {
-      var callback = function(){};
+    "implicitly assigned to any key along with context object": function(glue) {
+      var callback = function(){}, contextObject = { a: 'context'};
       glue.resetListeners();
 
-      glue.addListener('*:set,push', callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: glue.target,
-        operations: ['set', 'push']
-      }]);
+      glue.addListener(contextObject, callback);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: [],
+          context: contextObject
+        }]
+      });
     },
 
-    "assigned with a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
+    "explicitly assigned to any key along with context object": function(glue) {
+      var callback = function(){}, contextObject = { a: 'context'};
       glue.resetListeners();
 
       glue.addListener('*', contextObject, callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: contextObject
-      }]);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: [],
+          context: contextObject
+        }]
+      });
     },
 
-    "assigned with an operation and a context object": function(glue) {
+
+    "implicitly assigned to any key with an operation and a context object": function(glue) {
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener('*:push', contextObject, callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: contextObject,
-        operations: ['push']
-      }]);
+      glue.addListener(':push', contextObject, callback);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: ['push'],
+          context: contextObject
+        }]
+      });
     },
 
-    "assigned with an multiple operations and a context object": function(glue) {
+    "implicitly assigned to any key with multiple operations and a context object": function(glue) {
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener('*:push, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.any, [{
-        callback: callback,
-        context: contextObject,
-        operations: ['push', 'set']
-      }]);
-    }
-  },
+      glue.addListener(':push, set', contextObject, callback);
+      assert.deepEqual(glue.listeners.specific['*'], {
+        cache: {},
+        listeners: [{
+          callback: callback,
+          operations: ['push', 'set'],
+          context: contextObject
+        }]
+      });
+    },
 
-  "assigned key (single)": {
-    topic: new Glue({v1: ''}),
-
-    "assigned to target object's attribute": function(glue) {
+    "assigned explicitly to a key": function(glue) {
       var callback = function(){};
       glue.resetListeners();
 
       glue.addListener('v1', callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, context: glue.target }
-      ]});
+      assert.deepEqual(glue.listeners.specific.v1, {
+        cache: undefined,
+        listeners: [{
+          context: {},
+          operations: [],
+          callback: callback
+        }]
+      });
     },
 
-    "assigned along with operation restriction": function(glue) {
+    "assigned explicitly to a key along with operation restriction": function(glue) {
       var callback = function(){};
       glue.resetListeners();
 
       glue.addListener('v1:set', callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, operations: ['set'], context: glue.target}
-      ]});
+
+      assert.deepEqual(glue.listeners.specific.v1, {
+        cache: undefined,
+        listeners: [{
+          context: {},
+          operations: ['set'],
+          callback: callback
+        }]
+      });
     },
 
-    "assigned along with multiple operation restrictions": function(glue) {
+    "assigned explicitly to a key with multiple operation restrictions": function(glue) {
       var callback = function(){};
       glue.resetListeners();
 
       glue.addListener('v1:set, remove', callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, operations: ['set', 'remove'], context: glue.target}
-      ]});
+
+      assert.deepEqual(glue.listeners.specific.v1, {
+        cache: undefined,
+        listeners: [{
+          context: {},
+          operations: ['set', 'remove'],
+          callback: callback
+        }]
+      });
     },
 
-    "assigned with a context object": function(glue) {
+    "assigned explicitly to a key with a context object": function(glue) {
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
       glue.addListener('v1', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, context: contextObject }
-      ]});
+      assert.deepEqual(glue.listeners.specific.v1, {
+        cache: undefined,
+        listeners: [{ callback: callback, operations: [], context: contextObject }]
+      });
     },
 
-    "assigned with an operation and a context object": function(glue) {
+    "assigned explicitly to multiple keys": function(glue) {
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener('v1:set', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, context: contextObject, operations: ['set'] }
-      ]});
-    },
+      glue.addListener('v1, v2', contextObject, callback);
 
-    "assigned with an multiple operations and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
+      assert.deepEqual(glue.listeners.specific.v1, {
+        cache: undefined,
+        listeners: [{ callback: callback, operations: [], context: contextObject }]
+      });
 
-      glue.addListener('v1:remove, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback, context: contextObject, operations: ['remove', 'set'] }
-      ]});
+      assert.deepEqual(glue.listeners.specific.v2, {
+        cache: undefined,
+        listeners: [{ callback: callback, operations: [], context: contextObject }]
+      });
     },
 
     "assigned with multile listeners on the same key": function(glue) {
@@ -219,303 +258,27 @@ suite.addBatch({
       glue.addListener('v1', callback1);
       glue.addListener('v1', callback2);
 
-      assert.deepEqual(glue.listeners.assigned, {v1: [
-        { callback: callback1, context: glue.target},
-        { callback: callback2, context: glue.target}
-      ]});
+      assert.deepEqual(glue.listeners.specific.v1.listeners, [
+        { context: {}, operations: [], callback: callback1 },
+        { context: {}, operations: [], callback: callback2 }
+      ]);
     }
   },
 
-    "assigned key (multiple)": {
-    topic: new Glue({v1: '', v2: ''}),
-
-    "assigned to target object's attribute": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2', callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, context: glue.target }],
-        v2: [{ callback: callback, context: glue.target }]
-      });
-    },
-
-    "assigned along with operation restriction": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2:set', callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, operations: ['set'], context: glue.target }],
-        v2: [{ callback: callback, operations: ['set'], context: glue.target }]
-      });
-    },
-
-    "assigned along with multiple operation restrictions": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2:set, remove', callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, operations: ['set', 'remove'], context: glue.target }],
-        v2: [{ callback: callback, operations: ['set', 'remove'], context: glue.target }],
-      });
-    },
-
-    "assigned with a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, context: contextObject }],
-        v2: [{ callback: callback, context: contextObject }]
-      });
-    },
-
-    "assigned with an operation and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2:set', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, context: contextObject, operations: ['set'] }],
-        v2: [{ callback: callback, context: contextObject, operations: ['set'] }]
-      });
-    },
-
-    "assigned with an multiple operations and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('v1, v2:remove, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.assigned, {
-        v1: [{ callback: callback, context: contextObject, operations: ['remove', 'set'] }],
-        v2: [{ callback: callback, context: contextObject, operations: ['remove', 'set'] }]
-      });
-    }
-  },
-
-  "calculated key (single)": {
-    topic: new Glue({arr: []}),
-
-    "assigned to target object's attribute": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr#length', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr#length': [{ callback: callback, oldValue: 0, context: glue.target }]
-      });
-    },
-
-    "assigned along with operation restriction": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr#length:filter', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr#length': [
-          { callback: callback, oldValue: 0, context: glue.target, operations: ['filter'] }
-        ]
-      });
-    },
-
-    "assigned along with multiple operation restrictions": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr#length:filter, push', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr#length': [
-          { callback: callback, oldValue: 0, context: glue.target, operations: ['filter', 'push'] }
-        ]
-      });
-    },
-
-    "assigned with a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr#length', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr#length': [
-          { callback: callback, oldValue: 0, context: contextObject }
-        ]
-      });
-    },
-
-    "assigned with an operation and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr#length:push', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr#length': [
-          { callback: callback, oldValue: 0, context: contextObject, operations: ['push'] }
-        ]
-      });
-    },
-
-    "assigned with an multiple operations and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr#length:push, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        "arr#length": [
-          { callback: callback, oldValue: 0, context: contextObject, operations: ['push', 'set'] }
-        ]
-      });
-    },
-
-    "assigned with multile listeners on the same key": function(glue) {
-      var callback1 = function(){}
-          callback2 = function(){};
-
-      glue.resetListeners();
-
-      glue.addListener('arr#length', callback1);
-      glue.addListener('arr#length', callback2);
-
-      assert.deepEqual(glue.listeners.computed, {'arr#length': [
-        { callback: callback1, oldValue: 0, context: glue.target},
-        { callback: callback2, oldValue: 0, context: glue.target}
-      ]});
-    }
-  },
-
-  "calculated key (multiple)": {
-    topic: new Glue({arr1: [], arr2: []}),
-
-    "assigned to target object's attribute": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr1#length': [{ callback: callback, oldValue: 0, context: glue.target }],
-        'arr2#length': [{ callback: callback, oldValue: 0, context: glue.target }]
-      });
-    },
-
-    "assigned along with operation restriction": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length:filter', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr1#length': [{ callback: callback, oldValue: 0, operations: ['filter'], context: glue.target }],
-        'arr2#length': [{ callback: callback, oldValue: 0, operations: ['filter'], context: glue.target }]
-      });
-    },
-
-    "assigned along with multiple operation restrictions": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length:filter, push', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr1#length': [{ callback: callback, oldValue: 0, operations: ['filter', 'push'], context: glue.target }],
-        'arr2#length': [{ callback: callback, oldValue: 0, operations: ['filter', 'push'], context: glue.target }]
-      });
-    },
-
-    "assigned with a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr1#length': [{ callback: callback, oldValue: 0, context: contextObject }],
-        'arr2#length': [{ callback: callback, oldValue: 0, context: contextObject }]
-      });
-    },
-
-    "assigned with an operation and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length:push', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        'arr1#length': [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push'] }],
-        'arr2#length': [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push'] }]
-      });
-    },
-
-    "assigned with an multiple operations and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('arr1#length, arr2#length:push, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        "arr1#length": [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push', 'set'] }],
-        "arr2#length": [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push', 'set'] }]
-      });
-    }
-  },
-
-  "calculated key for array target object (single)": {
+  "generic": {
     topic: new Glue([]),
 
-    "assigned to target object's attribute": function(glue) {
+    "generic key": function(glue) {
       var callback = function(){};
+
       glue.resetListeners();
+      glue.addListener('[]', callback);
 
-      glue.addListener('#length', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        '#length': [{ callback: callback, oldValue: 0, context: glue.target}]
-      });
-    },
+      glue.push(1);
 
-    "assigned along with operation restriction": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('#length:filter', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        '#length': [{ callback: callback, oldValue: 0, operations: ['filter'], context: glue.target }]
-      });
-    },
-
-    "assigned along with multiple operation restrictions": function(glue) {
-      var callback = function(){};
-      glue.resetListeners();
-
-      glue.addListener('#length:filter, push', callback);
-      assert.deepEqual(glue.listeners.computed, {
-        '#length': [{ callback: callback, oldValue: 0, operations: ['filter', 'push'], context: glue.target }]
-      });
-    },
-
-    "assigned with a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('#length', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        '#length': [{ callback: callback, oldValue: 0, context: contextObject }]
-      });
-    },
-
-    "assigned with an operation and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('#length:push', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        '#length': [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push'] }]
-      });
-    },
-
-    "assigned with an multiple operations and a context object": function(glue) {
-      var callback = function(){}, contextObject = {};
-      glue.resetListeners();
-
-      glue.addListener('#length:push, set', contextObject, callback);
-      assert.deepEqual(glue.listeners.computed, {
-        "#length": [{ callback: callback, oldValue: 0, context: contextObject, operations: ['push', 'set'] }]
-      });
+      assert.deepEqual(glue.listeners.generic['[]'].listeners, [
+        { context: {}, operations: [], callback: callback },
+      ]);
     }
   }
 });

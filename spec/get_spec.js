@@ -13,7 +13,6 @@ suite.addBatch({
       glue.target = target;
 
       var obj = glue.get('');
-
       assert.equal(obj, glue.target);
     },
 
@@ -24,10 +23,19 @@ suite.addBatch({
       var obj = glue.get('');
 
       assert.equal(obj, glue.target);
+    },
+
+    "any key": function(glue) {
+      var target = {v1: 'obj'};
+      glue.target = target;
+
+      var obj = glue.get('*');
+
+      assert.equal(obj, glue.target);
     }
   },
 
-  "for assigned value": {
+  "for keys": {
     topic: new Glue({}),
 
     "can be retrieved": function(glue) {
@@ -38,51 +46,11 @@ suite.addBatch({
     "can be nested": function(glue) {
       glue.target = { v1: { v2: 'get this' }};
       assert.equal(glue.get('v1.v2'), 'get this');
-    }
-  },
-
-  "for computed value": {
-    topic: new Glue({}),
-
-    "can be retrived": function(glue) {
-      glue.target = { arr: [1] };
-      assert.equal(glue.get('arr#length'), 1);
     },
 
-    "can be nested": function(glue) {
-      glue.target = { v1: {arr: [1]} };
-      assert.equal(glue.get('v1.arr#length'), 1);
-    }
-  },
-
-  "in arrays": {
-    topic: new Glue([]),
-
-    "for computed value": function(glue) {
-      assert.equal(glue.get('#length'), 0);
-    }
-  },
-
-  "alternate object": {
-    topic: new Glue({v1: 'not this'}),
-
-    "can be specified for a key": function(glue) {
-      var obj = {v1: 'this one'};
-      assert.equal(glue.get('v1', obj), 'this one');
-    },
-
-    "can be specified for an array": function(glue) {
-      var obj = [1, 2, 3];
-      assert.equal(glue.get('[1]', obj), 2);
-    }
-  },
-
-  "normalizes keys": {
-    topic: new Glue({}),
-
-    "removes spaces on keys": function(glue) {
-      glue.target = { v1: { v2: 1 }};
-      assert.equal(glue.get('v1.         v2'), 1);
+    "undefined keys": function(glue) {
+      glue.target = { v1: { v2: 'get this' }};
+      assert.equal(glue.get('v3'), undefined);
     }
   }
 });

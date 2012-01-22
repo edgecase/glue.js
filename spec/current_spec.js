@@ -1,27 +1,33 @@
 // var vows = require('vows')
+// ,   _ = require('underscore')
 // ,   assert = require('assert')
 // ,   Glue   = require(__dirname + "/../lib/glue")
 // 
 // ,   suite = vows.describe('current spec');
 // 
 // suite.addBatch({
-//   "current test": {
-//     topic: new Glue ({ v1: { arr: [ { v2: '' } ]}}),
+//   "all": {
+//     topic: new Glue({v1: ''}),
 // 
-//     "notifies listeners that the value has been removed": function(topic) {
-//       var message;
+//     "notifies all listeners assigned to any key (*)": function(glue) {
+//       var message  = {};
 // 
-//       topic.target = {v1: 'value'};
+//       glue.target = {v1: 1};
+//       glue.resetListeners();
 // 
-//       topic.addListener('v1', function(msg) {
+//       glue.addListener('v1', function(msg) {
 //         message = msg;
 //       });
 // 
-//       topic.remove('v1');
+//       glue.set('v1', 2);
 // 
-//       assert.deepEqual(message, { operation: 'remove', oldValue: 'value' });
+//       assert.deepEqual(message, {
+//         operation: 'set',
+//         oldValue: 1,
+//         currentValue: 2
+//       });
 //     }
-//   }
+//   },
 // });
 // 
 // suite.export(module)
