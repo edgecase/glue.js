@@ -118,6 +118,25 @@ suite.addBatch({
         oldValue: 1,
         currentValue: 2
       });
+    },
+
+    "notifies generics children": function() {
+      var glue = new Glue([ { v1: { arr: [1, 2, 3] }} ]);
+          messages= [];
+
+      glue.resetListeners();
+
+      glue.addListener('[0].v1.arr[]', function(msg) {
+        messages.push(msg);
+      });
+
+      glue.set('[0]', { v1: { arr: [4, 5, 6] }});
+
+      assert.deepEqual(messages, [
+        { oldValue: 1, currentValue: 4, index: 0, operation: 'set' },
+        { oldValue: 2, currentValue: 5, index: 1, operation: 'set' },
+        { oldValue: 3, currentValue: 6, index: 2, operation: 'set' }
+      ]);
     }
   }
 });
