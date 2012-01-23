@@ -6,10 +6,8 @@ var suite  = vows.describe('filter operation');
 
 suite.addBatch({
   "target obj": {
-    topic: new Glue([]),
-
-    "filter on array target obj": function(glue) {
-      glue.target = [1,2,3,4,5];
+    "filter on array target obj": function() {
+      var glue = new Glue([1,2,3,4,5]);
 
       glue.filter(function(num) {
         return num % 2 === 0;
@@ -18,8 +16,8 @@ suite.addBatch({
       assert.deepEqual(glue.target, [2,4]);
     },
 
-    "filter on array nested inside obj": function(glue) {
-      glue.target = { arr: [1,2,3,4,5] };
+    "filter on array nested inside obj": function() {
+      var glue = new Glue({ arr: [1,2,3,4,5] });
 
       glue.filter('arr', function(num) {
         return num % 2 === 0;
@@ -30,33 +28,22 @@ suite.addBatch({
   },
 
   "notification" : {
-    topic: new Glue({}),
-
-    "notifies in decending order": function(glue) {
-      var original = [],
-          current = [];
-
-      glue.target = [1,2,3,4,5];
+    "notifies in decending order": function() {
+      var messages = [],
+          glue = new Glue([1,2,3,4,5]);
 
       glue.addListener('[]', function(msg) {
-        original.push([msg.oldIndex, msg.oldValue]);
-        current.push([msg.currentIndex, msg.currentValue]);
+        messages.push(msg);
       });
 
       glue.filter(function(num) {
         return num % 2 === 0;
       });
 
-      assert.deepEqual(original, [
-        [ 4, 5 ],
-        [ 2, 3 ],
-        [ 0, 1 ]
-      ]);
-
-      assert.deepEqual(current, [
-        [ undefined, undefined ],
-        [ undefined, undefined ],
-        [ undefined, undefined ]
+      assert.deepEqual(messages, [
+        { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
+        { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
+        { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
       ]);
     }
   }

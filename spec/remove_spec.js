@@ -6,26 +6,23 @@ var suite  = vows.describe('removing from target obj');
 
 suite.addBatch({
   "non collection": {
-    topic: new Glue({}),
-
-    "removes a key": function(topic) {
-      topic.target = {v1: 'value'};
+    "removes a key": function() {
+      var topic = new Glue({v1: 'value'});
       topic.remove('v1');
 
       assert.equal(topic.target.v1, undefined);
     },
 
-    "removes nested key": function(topic) {
-      topic.target = {v1: {v2: 'value'}};
+    "removes nested key": function() {
+      var topic = new Glue({v1: {v2: 'value'}});
       topic.remove('v1.v2');
 
       assert.equal(topic.target.v1.v2, undefined);
     },
 
-    "notifies listeners that the value has been removed": function(topic) {
-      var message;
-
-      topic.target = {v1: 'value'};
+    "notifies listeners that the value has been removed": function() {
+      var message,
+          topic = new Glue({v1: 'value'});
 
       topic.addListener('v1', function(msg) {
         message = msg;
@@ -33,48 +30,52 @@ suite.addBatch({
 
       topic.remove('v1');
 
-      assert.deepEqual(message, { operation: 'remove', oldValue: 'value' });
+      assert.deepEqual(message, {
+        oldValue: 'value',
+        currentValue: undefined,
+        operation: 'remove'
+      });
     }
   },
 
   "collection": {
-    topic: new Glue([]),
-
-    "removes from index": function(topic) {
-      topic.target = [1, 2, 3];
+    "removes from index": function() {
+      var topic = new Glue([1, 2, 3]);
       topic.remove('[1]');
 
       assert.deepEqual(topic.target, [1,3]);
     },
 
-    "remove from an array in an object": function(topic) {
-      topic.target = {arr: [1, 2, 3]};
+    "remove from an array in an object": function() {
+      var topic = new Glue({arr: [1, 2, 3]});
       topic.remove('arr[1]');
 
       assert.deepEqual(topic.target.arr, [1,3]);
     },
 
-    "remove from a multi-dimentional array": function(topic) {
-      topic.target = {arr: [[1, 2, 3], [1, 2, 3]]};
+    "remove from a multi-dimentional array": function() {
+      var topic = new Glue({arr: [[1, 2, 3], [1, 2, 3]]});
       topic.remove('arr[0][1]');
 
       assert.deepEqual(topic.target.arr, [[1, 3], [1, 2, 3]]);
     },
 
-    "notifies listeners of collection": function(topic) {
-      var message;
+    "notifies listeners of collection": function() {
+      var message,
+          topic = new Glue({arr: [1, 2, 3]});
 
-      topic.target = {arr: [1, 2, 3]};
       topic.resetListeners();
 
       topic.addListener("arr[0]", function(msg) {
         message = msg;
       });
 
+
       topic.remove('arr[0]');
       assert.deepEqual(message, {
         oldValue: 1,
-        oldIndex: 0,
+        currentValue: 2,
+        index: 0,
         operation: 'remove'
       });
     }
