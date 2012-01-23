@@ -8,17 +8,16 @@ suite.addBatch({
   "non nested": {
     topic: new Glue([]),
 
-    "pushes an element into an array": function(topic) {
-      topic.target = [];
+    "pushes an element into an array": function() {
+      var topic = new Glue([]);
 
       topic.push(1);
       assert.deepEqual(topic.target, [1]);
     },
 
     "notifies listeners to target": function(topic) {
-      var message;
-
-      topic.target = [];
+      var topic = new Glue([]),
+          message;
 
       topic.addListener('[]', function(msg) {
         message = msg;
@@ -27,8 +26,9 @@ suite.addBatch({
       topic.push(2);
 
       assert.deepEqual(message, {
+        oldValue: undefined,
         operation: 'push',
-        currentIndex: 0,
+        index: 0,
         currentValue: 2
       });
     }
@@ -59,9 +59,8 @@ suite.addBatch({
     },
 
     "notifies listeners to target": function(topic) {
-      var message;
-
-      topic.target = { arr: [] };
+      var message,
+          topic = new Glue({ arr: [] });
 
       topic.addListener('arr', function(msg) {
         message = msg;
