@@ -89,12 +89,12 @@ suite.addBatch({
     }
   },
 
-  chainability: {
+  "returns removed item": {
     topic: new Glue([1]),
 
     "returns itself for chainalibility": function(topic) {
       var returnedValue = topic.remove('[0]');
-      assert.deepEqual(topic, returnedValue)
+      assert.deepEqual(returnedValue, 1)
     }
   }
 });
