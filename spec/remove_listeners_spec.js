@@ -83,7 +83,7 @@ suite.addBatch({
       glue.addListener('v1:ops1', {a: 'context'}, callback);
 
       glue.removeListener('v1');
-      assert.deepEqual(glue.listeners.specific['*'].listeners.length, 2);
+      assert.deepEqual(glue.listeners.specific['*'].length, 2);
       assert.deepEqual(glue.listeners.specific['v1'], undefined);
     },
 
@@ -103,8 +103,8 @@ suite.addBatch({
       glue.addListener('v1:ops1', {a: 'context'}, callback);
 
       glue.removeListener('v1:op1');
-      assert.deepEqual(glue.listeners.specific['*'].listeners.length, 2);
-      assert.deepEqual(glue.listeners.specific['v1'].listeners.length, 2);
+      assert.deepEqual(glue.listeners.specific['*'].length, 2);
+      assert.deepEqual(glue.listeners.specific['v1'].length, 2);
     },
 
     "removes a key with operation and context": function(glue) {
@@ -125,8 +125,8 @@ suite.addBatch({
 
       glue.removeListener(':ops1', context);
 
-      assert.equal(glue.listeners.specific['*'].listeners.length, 1);
-      assert.equal(glue.listeners.specific['v1'].listeners.length, 2);
+      assert.equal(glue.listeners.specific['*'].length, 1);
+      assert.equal(glue.listeners.specific['v1'].length, 2);
     },
 
     "removes an operation and context": function(glue) {
@@ -147,8 +147,8 @@ suite.addBatch({
 
       glue.removeListener(':ops1', context);
 
-      assert.equal(glue.listeners.specific['*'].listeners.length, 1);
-      assert.equal(glue.listeners.specific['v1'].listeners.length, 2);
+      assert.equal(glue.listeners.specific['*'].length, 1);
+      assert.equal(glue.listeners.specific['v1'].length, 2);
     },
 
     "removes generic keys": function(glue) {
@@ -166,7 +166,7 @@ suite.addBatch({
 
       glue.removeListener('[]:set', context);
 
-      assert.deepEqual(glue.listeners.specific['v1'].listeners.length, 1);
+      assert.deepEqual(glue.listeners.specific['v1'].length, 1);
       assert.deepEqual(glue.listeners.generic, {});
     }
   },

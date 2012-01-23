@@ -25,13 +25,11 @@ var suite  = vows.describe('notification system');
 
 suite.addBatch({
   "assigned (non-nested)": {
-    topic: new Glue({}),
-
     "notifies all listeners assigned to any key (*)": function(glue) {
-      var message1 = {},
+      var glue = new Glue({v1: 1}),
+          message1 = {},
           message2 = {};
 
-      glue.target = {v1: 1};
       glue.resetListeners();
 
       glue.addListener(function(msg) {
@@ -57,10 +55,10 @@ suite.addBatch({
       });
     },
 
-    "notifies listeners assigned to the key": function(glue) {
-      var message  = {};
+    "notifies listeners assigned to the key": function() {
+      var glue = new Glue({v1: 1}),
+          message  = {};
 
-      glue.target = {v1: 1};
       glue.resetListeners();
 
       glue.addListener('v1', function(msg) {
@@ -76,11 +74,11 @@ suite.addBatch({
       });
     },
 
-    "notifies listeners that matches an operation": function(glue) {
-      var message1 = {},
+    "notifies listeners that matches an operation": function() {
+      var glue = new Glue({v1: 1}),
+          message1 = {},
           message2 = {};
 
-      glue.target = {v1: 1};
       glue.resetListeners();
 
       glue.addListener('v1:set', function(msg) {
@@ -102,10 +100,10 @@ suite.addBatch({
       assert.deepEqual(message2, {});
     },
 
-    "notifies generics": function(glue) {
-      var message = {};
+    "notifies generics": function() {
+      var glue = new Glue([1]);
+          message = {};
 
-      glue.target = [1];
       glue.resetListeners();
 
       glue.addListener('[]', function(msg) {
