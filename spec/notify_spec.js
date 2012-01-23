@@ -130,12 +130,12 @@ suite.addBatch({
         messages.push(msg);
       });
 
-      glue.set('[0]', { v1: { arr: [4, 5, 6] }});
+      glue.set('[0]', { v1: { arr: [4, 5] }});
 
       assert.deepEqual(messages, [
         { oldValue: 1, currentValue: 4, index: 0, operation: 'set' },
         { oldValue: 2, currentValue: 5, index: 1, operation: 'set' },
-        { oldValue: 3, currentValue: 6, index: 2, operation: 'set' }
+        { oldValue: 3, currentValue: undefined, index: 2, operation: 'set' }
       ]);
     }
   }
