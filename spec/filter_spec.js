@@ -30,13 +30,13 @@ suite.addBatch({
   "notification" : {
     "notifies in decending order": function() {
       var messages = [],
-          glue = new Glue([1,2,3,4,5]);
+          glue = new Glue({ arr: [1,2,3,4,5] });
 
-      glue.addListener('[]', function(msg) {
+      glue.addListener('arr[]', function(msg) {
         messages.push(msg);
       });
 
-      glue.filter(function(num) {
+      glue.filter('arr', function(num) {
         return num % 2 === 0;
       });
 
