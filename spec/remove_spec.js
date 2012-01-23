@@ -75,7 +75,6 @@ suite.addBatch({
       assert.deepEqual(message, {
         oldValue: 1,
         currentValue: 2,
-        index: 0,
         operation: 'remove'
       });
     }
