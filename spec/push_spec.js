@@ -6,8 +6,6 @@ var suite  = vows.describe('pushing to the target object');
 
 suite.addBatch({
   "non nested": {
-    topic: new Glue([]),
-
     "pushes an element into an array": function() {
       var topic = new Glue([]);
 
@@ -15,7 +13,7 @@ suite.addBatch({
       assert.deepEqual(topic.target, [1]);
     },
 
-    "notifies listeners to target": function(topic) {
+    "notifies listeners to target": function() {
       var topic = new Glue([]),
           message;
 
@@ -35,30 +33,28 @@ suite.addBatch({
   },
 
   "nested arrays": {
-    topic: new Glue({}),
-
-    "can be push into with a key": function(topic) {
-      topic.target = { arr: [] };
+    "can be push into with a key": function() {
+      var topic = new Glue({ arr: [] });
 
       topic.push('arr', 1);
       assert.deepEqual(topic.target.arr, [1]);
     },
 
-    "can be push into arrays nested under other keys": function(topic) {
-      topic.target = { v1: { arr: [] }};
+    "can be push into arrays nested under other keys": function() {
+      var topic = new Glue({ v1: { arr: [] }});
 
       topic.push('v1.arr', 1);
       assert.deepEqual(topic.target.v1.arr, [1]);
     },
 
-    "can be push into arrays nested under other keys": function(topic) {
-      topic.target = { arr1: [ {arr2: [] }] };
+    "can be push into arrays nested under other keys": function() {
+      var topic = new Glue({ arr1: [ {arr2: [] } ]});
 
       topic.push('arr1[0].arr2', 1);
       assert.deepEqual(topic.target, { arr1: [ {arr2: [1] }] });
     },
 
-    "notifies listeners to target": function(topic) {
+    "notifies listeners to target": function() {
       var message,
           topic = new Glue({ arr: [] });
 
