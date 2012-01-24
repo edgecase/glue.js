@@ -26,6 +26,8 @@ glue.set('v1', 'a value'); // 'Target object changed.'
 In the example above, `"Target object changed."` is logged on the console when
 the value of `v1` changed by the `set` operator.
 
+For more examples, please see the specs directory.
+
 # Core methods
 ##contructor
 ```javascript
