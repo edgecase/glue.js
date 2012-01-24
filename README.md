@@ -221,7 +221,8 @@ glue.addListener(myContext, function(message) {
 ```
 When the callback above is executed, `myContext` will have the value `{ a: 'context' }`
 
-The context can be used in conjuction with keys and operations like so:
+The context can be used in conjuction with keys and operations like so
+
 ```javascript
 glue.addListener('v1:set', context, function(message) {
   // callback
@@ -436,7 +437,7 @@ console.log(glue.target); ['1elem', '2elem', '3elem', '4elem' ,'5elem']
 ##swap
 ```javascript
 glue.swap(key1, key2);
-
+```
 Example
 
 ```javascript
