@@ -344,7 +344,7 @@ Example:
 
 ```javascript
 var glue = new Glue({ v1: '' });
-glue.set('v1', 'something);
+glue.set('v1', 'something');
 
 console.log(glue.target); // { 'v1', 'something' }
 ```
@@ -431,7 +431,7 @@ Example
 var glue = new Glue(_.shuffle(['1elem', '2elem', '3elem', '4elem' ,'5elem']));
 
 glue.sortBy(function(elem) { return parseInt(elem) });
-console.log(glue.target); ['1elem', '2elem', '3elem', '4elem' ,'5elem']
+console.log(glue.target); //['1elem', '2elem', '3elem', '4elem' ,'5elem']
 ```
 
 ##swap
