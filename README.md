@@ -162,7 +162,7 @@ glue.addListener('v1:set', function(message) {
 Setting a listener for multiple operations:
 
 ```javascript
-glue.addListener('v1:set, v2:push, insert', function(message) {
+glue.addListener('v1:set, v2:push, :insert', function(message) {
   // callback
 });
 ```
