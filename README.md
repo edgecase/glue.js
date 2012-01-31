@@ -1,9 +1,9 @@
 # Overview
 `glue.js` is a general purpose hash/array observer for Javascript. It
 gives users the ability add listeners that executes a callback
-particular change occurs on a javascript object.
+particular change occurs on a Javascript object.
 
-# Example
+# Basic Use
 Given the following object:
 
 ```javascript
@@ -16,7 +16,7 @@ of `Glue`.
 ```javascript
 var glue = new Glue(targetObject);
 
-glue.addListener(function() {
+glue.addListener("*", function() {
   console.log('Target object changed.');
 });
 
@@ -28,146 +28,77 @@ the value of `v1` changed by the `set` operator.
 
 For more examples, please see the specs directory.
 
-# Core methods
-##contructor
-```javascript
-new Glue(targetObject);
-```
-
-**targetObject:** the object that will be observed by `Glue`.
-
-##addListener
-```javascript
-glue.addListener([key(s):operation(s)], [context], callback);
-```
-
-**key(s) (optional):** specifies the key or index will have to change for the callback to be executed.
-If no key is specified it defaults to the `'*'` key which executes if anything changes on the target object.
-
-**operation(s) (optional):** restricts the callback's execution for a particular operation. (push, pop, etc.)
-
-**context (optional):** the context which the callback is to be executed. By default, callbacks are
-executed in the context of the `target` object.
-
-**callback:** the function to be executed when the listener is notified. Callbacks are passed a
-message parameter that contains information about what changed on the `key` being listened to.
-
 ###Keys
-Assume the following array as the target object.
+Keys are a core concept in Glue, for both listeners and operations (ie: set).
 
 ```javascript
-var target1 = [1, 2, 3, 4, 5],
-    glue = new Glue(target1);
+var target = {
+  name: "Felix",
+  contact: {
+    phone: "555-555-5555",
+    email: "felix@edgecase.com"
+  }
+}
+
+var glue = new Glue(target);
 ```
-then we can declare the following listeners:
 
 ```javascript
-glue.addListener('[0]', function(message) {
-  // callback
+glue.addListener("", function(message) {
+  // callback will be triggered on any modification
+  // ex: glue.set("name", "foo");
+  // ex: glue.set("contact.email", "foo@edgecase.com");
 });
+```
 
+```javascript
+glue.addListener("contact", function(message) {
+  // callback will be triggered on any modification to the contact property
+  // ex: glue.set("contact", {});
+  // ex: glue.set("contact.email", "foo@edgecase.com");
+
+  // callback will not be triggered on modification of other properties
+  // ex: glue.set("name", "foo");
+});
+```
+
+```javascript
+glue.addListener("contact.email", function(message) {
+  // callback will be triggered on any modification to the email property of the contact object.
+  // ex: glue.set("contact.email", "foo@edgecase.com");
+
+  // callback will not be triggered on modification of other properties
+  // ex: glue.set("contact.phone", "123-456-7890");
+});
+```
+
+####Array Specific Keys
+Assume the following target
+
+```javascript
+var target1 = [1, 2, 3, 4, 5];
+var glue = new Glue(target1);
+```
+
+```javascript
+glue.addListener('[2]', function(message) {
+  // callback is executed only when a change occurs to the element at index 2 of the array.
+});
+```
+
+```javascript
 glue.addListener('[]', function(message) {
-  // callback
-});
-
-glue.addListener('*', function(message) {
-  // callback
+  // callback is executed for every element that changes in the array.
 });
 ```
 
-`[0]` is executed only when a change occurs to the first element of the array, `[1]` on the second, and so on.
-
-`[]` is executed for every element that changes in the array.
-
-For example:
-
+####Additional Examples
 ```javascript
-var messages = [],
-    target1 = [1, 2, 3, 4, 5],
-    glue = new Glue(target1);
-
-glue.addListener('[]', function(msg) {
-  messages.push(msg);
-});
-
-glue.filter(function(num) {
-  return num % 2 === 0;
-});
-
-console.log(messages)
-
-// ------------------------------- messages ---------------------------------
-// [
-//   { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
-//   { oldValue: 4, currentValue: undefined, index: 3, operation: 'filter' },
-//   { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
-//   { oldValue: 2, currentValue: 4, index: 1, operation: 'filter' },
-//   { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
-// ];
-// --------------------------------------------------------------------------
+var target = { v1: { arr1: [ { v2: { arr2: [ 'something' ] } } ] } };
+var glue = new Glue(target);
 ```
 
-Users can add listeners to the array itself like in the example below.
-
-```javascript
-var messages = [],
-    target1 = [1, 2, 3, 4, 5],
-    glue = new Glue(target1);
-
-glue.addListener('*', function(msg) {
-  messages.push(msg);
-});
-
-glue.filter(function(num) {
-  return num % 2 === 0;
-});
-
-console.log(messages); // [{ oldValue: [ 1, 2, 3, 4, 5 ], currentValue: [ 2, 4 ], operation: 'filter' }]
-```
-
-Since the default key is `'*'` the following example would yeild an identical message
-
-```javascript
-glue.addListener(function(msg) {
-  messages.push(msg);
-});
-```
-
-Keys can be assigned to keys of hashes:
-
-```javascript
-var messages = [],
-    target1 = { arr: [1, 2, 3, 4, 5] },
-    glue = new Glue(target1);
-
-glue.addListener('arr[]', function(msg) {
-  messages.push(msg);
-});
-
-glue.filter('arr', function(num) {
-  return num % 2 === 0;
-});
-
-console.log(messages)
-
-// ------------------------------- messages ---------------------------------
-// [
-//   { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
-//   { oldValue: 4, currentValue: undefined, index: 3, operation: 'filter' },
-//   { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
-//   { oldValue: 2, currentValue: 4, index: 1, operation: 'filter' },
-//   { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
-// ];
-// --------------------------------------------------------------------------
-```
-
-Keys can be nested within a hash of arbitrary complexity:
-
-```javascript
-var target5 = { v1: { arr1: [ { v2: { arr2: [ 'something' ] } } ] } };
-```
-
-`target5` can have the following keys:
+The following keys can be used:
 
 ```javascript
 'v1.arr1[0].v2.arr2[0]',
@@ -181,17 +112,46 @@ var target5 = { v1: { arr1: [ { v2: { arr2: [ 'something' ] } } ] } };
 '*'
 ```
 
-Note that generic element keys can only be specified if it at the end of the key.
+Felix -- add constraint
 
-Lastly, multiple keys can be added simultaneously:
+# Core methods
+##Constructor
+```javascript
+new Glue(targetObject);
+```
+
+**targetObject:** the object that will be observed by `Glue`.
+
+##addListener
+```javascript
+glue.addListener([key(s):operation(s)], [context], callback);
+```
+
+**key(s) (optional):** specifies the key or index that will be observed by the listener.
+
+**operation(s) (optional):** restricts the callback's execution for a particular operation. (push, pop, etc.)
+
+**context (optional):** the context which the callback is to be executed. By default, callbacks are
+executed in the context of the `target` object.
+
+**callback:** the function to be executed when the listener is notified. Callbacks are passed a
+message parameter that contains information about what changed on the `key` being listened to.
+
+###Examples
+
+Setting a listen for a key:
+
+```javascript
+glue.addListener('v1', callback);
+```
+
+Setting a listener for multiple keys:
 
 ```javascript
 glue.addListener('v1, v2', callback);
 ```
 
-
-###Operation(s)
-All keys can be restricted to only execute for a particular operation. For example:
+Setting a listener for a specific operation:
 
 ```javascript
 glue.addListener('v1:set', function(message) {
@@ -199,17 +159,16 @@ glue.addListener('v1:set', function(message) {
 });
 ```
 
-Will only be executed if the change on `v1` resulted from a `set` operation. Multiple
-operations can be specified per a listener.
+Setting a listener for multiple operations:
 
 ```javascript
-glue.addListener('v1:set, push, insert', function(message) {
+glue.addListener('v1:set, v2:push, insert', function(message) {
   // callback
 });
 ```
 
 ###Context
-By default a callbacks are executed in the `context` of the `target` object, but can be specified by following:
+By default all callbacks are executed in the `context` of the `target` object, but can be specified by following:
 
 ```javascript
 var myContext = { a: ''};
@@ -221,7 +180,7 @@ glue.addListener(myContext, function(message) {
 ```
 When the callback above is executed, `myContext` will have the value `{ a: 'context' }`
 
-The context can be used in conjuction with keys and operations like so
+The context can be used in conjunction with keys and operations as follows:
 
 ```javascript
 glue.addListener('v1:set', context, function(message) {
@@ -245,9 +204,34 @@ glue.set('v1', 'Hello');
 console.log(context); // { myWord: 'Hello' }
 ```
 
-###Message
+###Messages
+A message object is passed to the listener callback function.
 
-Messages are composed depending on the type of key is assigned to the listener.
+####Basic Messages
+
+```javascript
+var messages = [],
+    target1 = { foo: "bar" },
+    glue = new Glue(target1);
+
+
+glue.addListener('*', function(msg) {
+  console.log(message);
+});
+
+glue.set('foo', 'baz');
+
+// Output
+// {
+//   oldValue: "bar",
+//   currentValue: "baz",
+//   operation: 'set'
+// }
+```
+
+####Array Specific messages
+
+Messages content depend on the type of key is assigned to the listener.
 
 ```javascript
 var message,
@@ -302,6 +286,32 @@ console.log(message);
 // }
 ```
 
+```javascript
+var messages = [],
+    target1 = [1, 2, 3, 4, 5],
+    glue = new Glue(target1);
+
+glue.addListener('[]', function(msg) {
+  messages.push(msg);
+});
+
+glue.filter(function(num) {
+  return num % 2 === 0;
+});
+
+console.log(messages)
+
+// ------------------------------- messages ---------------------------------
+// [
+//   { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
+//   { oldValue: 4, currentValue: undefined, index: 3, operation: 'filter' },
+//   { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
+//   { oldValue: 2, currentValue: 4, index: 1, operation: 'filter' },
+//   { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
+// ];
+// --------------------------------------------------------------------------
+```
+
 ##removeListener
 ```javascript
 glue.addListener([key(s):operation(s))], [context]);
@@ -334,7 +344,6 @@ glue.removeListener('key:operation1, operation2', context);
 glue.removeListener('key1, key2:operation, operation2', context);
 ```
 
-# Operations
 ##set
 ```javascript
 glue.set(key, value);
