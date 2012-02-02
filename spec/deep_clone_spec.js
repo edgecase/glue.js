@@ -6,15 +6,6 @@ var vows = require('vows')
 
 suite.addBatch({
   "cloning": {
-    "undefined": function() {
-      var a = undefined,
-          b = Glue.deepClone(a);
-
-      b = 'something';
-      assert.equal(a, undefined);
-      assert.equal(b, 'something');
-    },
-
     "[]": function() {
       var a = [],
           b = Glue.deepClone(a);
@@ -67,7 +58,7 @@ suite.addBatch({
 
       b[0][1].v1 = 'something';
       assert.deepEqual(a, [[aFunction, {v1: { v2: aFunction }}], {v1: [1, 2, 3]}, aFunction]);
-      assert.deepEqual(b, [[aFunction, {v1: "something" }], {v1: [1, 2, 3]}, aFunction]);
+      assert.deepEqual(b, [[null, {v1: "something" }], {v1: [1, 2, 3]}, null]);
     }
   },
 });
