@@ -112,7 +112,8 @@ The following keys can be used:
 '*'
 ```
 
-Felix -- add constraint
+Note that generics `[]` can only be at the end of the key.
+Example: `'v1.arr1[0].arr2[]'` is legal, but `'v1.arr1[].arr2[]'` is not
 
 # Core methods
 ##Constructor
