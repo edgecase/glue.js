@@ -24,10 +24,9 @@ suite.addBatch({
       topic.push(2);
 
       assert.deepEqual(message, {
-        oldValue: undefined,
         operation: 'push',
         index: 0,
-        currentValue: 2
+        value: 2
       });
     }
   },
@@ -65,8 +64,7 @@ suite.addBatch({
       topic.push('arr', 2);
 
       assert.deepEqual(message, {
-        oldValue: [],
-        currentValue: [ 2 ],
+        value: [ 2 ],
         operation: 'push'
       });
     }

@@ -45,7 +45,7 @@ suite.addBatch({
 
       glue.swap('[0]', '[2]');
       assert.deepEqual(messages, [
-        { oldValue: [ 1, 2, 3 ], currentValue: [ 3, 2, 1 ], operation: 'swap' }
+        { value: [ 3, 2, 1 ], operation: 'swap' }
       ]);
     }
   },

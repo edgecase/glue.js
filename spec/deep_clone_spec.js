@@ -54,11 +54,11 @@ suite.addBatch({
     "[[function, {v1: { v2: function }}], {v1: [1, 2, 3]}, function]": function() {
       var aFunction = function() {};
           a = [[aFunction, {v1: { v2: aFunction }}], {v1: [1, 2, 3]}, aFunction],
-          b = Glue.deepClone(a);
+          b = Glue.deepClone(a, true);
 
       b[0][1].v1 = 'something';
       assert.deepEqual(a, [[aFunction, {v1: { v2: aFunction }}], {v1: [1, 2, 3]}, aFunction]);
-      assert.deepEqual(b, [[null, {v1: "something" }], {v1: [1, 2, 3]}, null]);
+      assert.deepEqual(b, [[aFunction, {v1: "something" }], {v1: [1, 2, 3]}, aFunction]);
     }
   },
 });

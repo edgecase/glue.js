@@ -44,14 +44,12 @@ suite.addBatch({
 
       assert.deepEqual(message1, {
         operation: 'set',
-        oldValue: {v1: 1},
-        currentValue: {v1: 2}
+        value: {v1: 2}
       });
 
       assert.deepEqual(message2, {
         operation: 'set',
-        oldValue: {v1: 1},
-        currentValue: {v1: 2}
+        value: {v1: 2}
       });
     },
 
@@ -69,8 +67,7 @@ suite.addBatch({
 
       assert.deepEqual(message, {
         operation: 'set',
-        oldValue: 1,
-        currentValue: 2
+        value: 2
       });
     },
 
@@ -93,8 +90,7 @@ suite.addBatch({
 
       assert.deepEqual(message1, {
         operation: 'set',
-        oldValue: 1,
-        currentValue: 2
+        value: 2
       });
 
       assert.deepEqual(message2, {});
@@ -115,8 +111,7 @@ suite.addBatch({
       assert.deepEqual(message, {
         operation: 'set',
         index: 0,
-        oldValue: 1,
-        currentValue: 2
+        value: 2
       });
     },
 
@@ -133,9 +128,9 @@ suite.addBatch({
       glue.set('[0]', { v1: { arr: [4, 5] }});
 
       assert.deepEqual(messages, [
-        { oldValue: 1, currentValue: 4, index: 0, operation: 'set' },
-        { oldValue: 2, currentValue: 5, index: 1, operation: 'set' },
-        { oldValue: 3, currentValue: undefined, index: 2, operation: 'set' }
+        { value: 4, index: 0, operation: 'set' },
+        { value: 5, index: 1, operation: 'set' },
+        { value: undefined, index: 2, operation: 'set' }
       ]);
     }
   }

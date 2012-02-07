@@ -33,10 +33,10 @@ suite.addBatch({
       glue.insert(1, 9);
 
       assert.deepEqual(messages, [
-        { oldValue: 2, currentValue: 9, index: 1, operation: 'insert' },
-        { oldValue: 3, currentValue: 2, index: 2, operation: 'insert' },
-        { oldValue: 4, currentValue: 3, index: 3, operation: 'insert' },
-        { oldValue: undefined, currentValue: 4, index: 4, operation: 'insert' }
+        { value: 9, index: 1, operation: 'insert' },
+        { value: 2, index: 2, operation: 'insert' },
+        { value: 3, index: 3, operation: 'insert' },
+        { value: 4, index: 4, operation: 'insert' }
       ]);
     },
 
@@ -51,11 +51,11 @@ suite.addBatch({
       glue.insert(0, 9);
 
       assert.deepEqual(messages, [
-        { oldValue: 1, currentValue: 9, index: 0, operation: 'insert' },
-        { oldValue: 2, currentValue: 1, index: 1, operation: 'insert' },
-        { oldValue: 3, currentValue: 2, index: 2, operation: 'insert' },
-        { oldValue: 4, currentValue: 3, index: 3, operation: 'insert' },
-        { oldValue: undefined, currentValue: 4, index: 4, operation: 'insert'
+        { value: 9, index: 0, operation: 'insert' },
+        { value: 1, index: 1, operation: 'insert' },
+        { value: 2, index: 2, operation: 'insert' },
+        { value: 3, index: 3, operation: 'insert' },
+        { value: 4, index: 4, operation: 'insert'
     }
       ]);
     },
@@ -71,7 +71,7 @@ suite.addBatch({
       glue.insert(4, 9);
 
       assert.deepEqual(messages, [
-        { oldValue: undefined, currentValue: 9, index: 4, operation: 'insert' }
+        { value: 9, index: 4, operation: 'insert' }
       ]);
     }
   },

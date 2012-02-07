@@ -44,8 +44,7 @@ suite.addBatch({
 
       topic.pop();
       assert.deepEqual(message, {
-        oldValue: [ 1, 2 ],
-        currentValue: [ 1 ],
+        value: [ 1 ],
         operation: 'pop'
       });
     }

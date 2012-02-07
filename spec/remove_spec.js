@@ -31,8 +31,7 @@ suite.addBatch({
       topic.remove('v1');
 
       assert.deepEqual(message, {
-        oldValue: 'value',
-        currentValue: undefined,
+        value: undefined,
         operation: 'remove'
       });
     }
@@ -73,8 +72,7 @@ suite.addBatch({
 
       topic.remove('arr[0]');
       assert.deepEqual(message, {
-        oldValue: 1,
-        currentValue: 2,
+        value: 2,
         operation: 'remove'
       });
     }

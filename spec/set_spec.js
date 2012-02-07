@@ -86,8 +86,7 @@ suite.addBatch({
       topic.set("v1", "bar");
 
       assert.deepEqual(message, {
-        oldValue: 'foo',
-        currentValue: 'bar',
+        value: 'bar',
         operation: 'set'
       });
     }

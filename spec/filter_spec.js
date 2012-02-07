@@ -41,11 +41,11 @@ suite.addBatch({
       });
 
       assert.deepEqual(messages, [
-        { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
-        { oldValue: 4, currentValue: undefined, index: 3, operation: 'filter' },
-        { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
-        { oldValue: 2, currentValue: 4, index: 1, operation: 'filter' },
-        { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
+        { value: undefined, index: 4, operation: 'filter' },
+        { value: undefined, index: 3, operation: 'filter' },
+        { value: undefined, index: 2, operation: 'filter' },
+        { value: 4, index: 1, operation: 'filter' },
+        { value: 2, index: 0, operation: 'filter' }
       ]);
     }
   }

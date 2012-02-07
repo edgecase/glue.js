@@ -31,10 +31,10 @@ suite.addBatch({
 
       glue.sortBy(function(elem) { return parseInt(elem) });
       assert.deepEqual(messages, [
-        { oldValue: '2elem', currentValue: '5elem', index: 4, operation: 'filter' },
-        { oldValue: '1elem', currentValue: '4elem', index: 3, operation: 'filter' },
-        { oldValue: '5elem', currentValue: '2elem', index: 1, operation: 'filter' },
-        { oldValue: '4elem', currentValue: '1elem', index: 0, operation: 'filter' }
+        { value: '5elem', index: 4, operation: 'filter' },
+        { value: '4elem', index: 3, operation: 'filter' },
+        { value: '2elem', index: 1, operation: 'filter' },
+        { value: '1elem', index: 0, operation: 'filter' }
       ]);
     }
   }
