@@ -197,7 +197,7 @@ var context = { myWord: 'Oh my' },
     glue = new Glue(target);
 
 glue.addListener(context, function(message) {
-  this.myWord = message.currentValue;
+  this.myWord = message.value;
 });
 
 glue.set('v1', 'Hello');
@@ -224,8 +224,7 @@ glue.set('foo', 'baz');
 
 // Output
 // {
-//   oldValue: "bar",
-//   currentValue: "baz",
+//   value: "baz",
 //   operation: 'set'
 // }
 ```
@@ -245,7 +244,7 @@ glue.addListener('arr[2]', function(msg) {
 
 glue.set('arr[2]', 9);
 
-console.log(message); // [{ oldValue: 3, currentValue: 9, operation: 'set' }]
+console.log(message); // [{ value: 9, operation: 'set' }]
 ```
 
 On the other hand:
@@ -262,7 +261,7 @@ glue.addListener('arr[]', function(msg) {
 
 glue.set('arr[2]', 9);
 
-console.log(message); // { oldValue: 3, currentValue: 9, index: 2, operation: 'set' }
+console.log(message); // { value: 9, index: 2, operation: 'set' }
 ```
 
 And directly to the `target`:
@@ -281,8 +280,7 @@ glue.set('arr[2]', 9);
 
 console.log(message);
 // {
-//   oldValue: { arr: [ 1, 2, 3, 4, 5 ] },
-//   currentValue: { arr: [ 1, 2, 9, 4, 5 ] },
+//   value: { arr: [ 1, 2, 9, 4, 5 ] },
 //   operation: 'set'
 // }
 ```
@@ -304,11 +302,11 @@ console.log(messages)
 
 // ------------------------------- messages ---------------------------------
 // [
-//   { oldValue: 5, currentValue: undefined, index: 4, operation: 'filter' },
-//   { oldValue: 4, currentValue: undefined, index: 3, operation: 'filter' },
-//   { oldValue: 3, currentValue: undefined, index: 2, operation: 'filter' },
-//   { oldValue: 2, currentValue: 4, index: 1, operation: 'filter' },
-//   { oldValue: 1, currentValue: 2, index: 0, operation: 'filter' }
+//   { value: undefined, index: 4, operation: 'filter' },
+//   { value: undefined, index: 3, operation: 'filter' },
+//   { value: undefined, index: 2, operation: 'filter' },
+//   { value: 4, index: 1, operation: 'filter' },
+//   { value: 2, index: 0, operation: 'filter' }
 // ];
 // --------------------------------------------------------------------------
 ```
