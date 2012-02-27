@@ -1,7 +1,7 @@
 # Overview
 `glue.js` is a general purpose hash/array observer for Javascript. It
-gives users the ability add listeners that executes a callback
-particular change occurs on a Javascript object.
+gives users the ability to add listeners to object properties, and automatically
+execute them when that property changes.
 
 # Basic Use
 Given the following object:
