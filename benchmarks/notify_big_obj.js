@@ -414,7 +414,7 @@ var model = {
 console.profile("notify");
 var glue = new Glue(model);
 
-glue.addListener("current", function(msg) {
+glue.addObserver("current", function(msg) {
   // console.log("OMFG");
 });
 

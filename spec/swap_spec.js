@@ -39,7 +39,7 @@ suite.addBatch({
       var messages = [];
           glue = new Glue([1, 2, 3]);
 
-      glue.addListener(function(msg) {
+      glue.addObserver(function(msg) {
         messages.push(msg);
       });
 

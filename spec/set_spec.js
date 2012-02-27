@@ -79,7 +79,7 @@ suite.addBatch({
     "notifies listeners with the new and old value": function(topic) {
       var message = [];
 
-      topic.addListener("v1", function(msg) {
+      topic.addObserver("v1", function(msg) {
         message = msg;
       });
 

@@ -3,12 +3,12 @@ var vows = require('vows')
 ,   assert = require('assert')
 ,   Glue   = require(__dirname + "/../lib/glue")
 
-,   suite = vows.describe('removeListener');
+,   suite = vows.describe('remove observer');
 
 // Removes listener for a specific key/operation combination or context object
 //
 // Usage:
-// glue.removeListener((key(s):operation(s)), [context]);
+// glue.removeObserver((key(s):operation(s)), [context]);
 //
 // key(s) (optional):
 //
@@ -17,12 +17,12 @@ var vows = require('vows')
 // context (optional):
 //
 // Examples
-// glue.removeListener('v1')
-// glue.removeListener(':set')
-// glue.removeListener('set:pop')
-// glue.removeListener(obj)
-// glue.removeListener(arr, obj)
-// glue.removeListener(arr:pop, obj)
+// glue.removeObserver('v1')
+// glue.removeObserver(':set')
+// glue.removeObserver('set:pop')
+// glue.removeObserver(obj)
+// glue.removeObserver(arr, obj)
+// glue.removeObserver(arr:pop, obj)
 var numberOfListeners = function(glue) {
   return _.reduce(glue.listeners, function(memo, listenerSet) {
     return memo + listenerSet.length;
@@ -37,14 +37,14 @@ suite.addBatch({
       glue.resetListeners();
 
       // remove
-      glue.addListener(function() {});
-      glue.addListener('v1', function() {});
-      glue.addListener('v1:ops1', function() {});
-      glue.addListener({a: 'context'}, function() {});
-      glue.addListener('v1', {a: 'context'}, function() {});
-      glue.addListener('v1:ops1', {a: 'context'}, function() {});
+      glue.addObserver(function() {});
+      glue.addObserver('v1', function() {});
+      glue.addObserver('v1:ops1', function() {});
+      glue.addObserver({a: 'context'}, function() {});
+      glue.addObserver('v1', {a: 'context'}, function() {});
+      glue.addObserver('v1:ops1', {a: 'context'}, function() {});
 
-      glue.removeListener();
+      glue.removeObserver();
       assert.deepEqual(glue.listeners.specific, {});
     },
 
@@ -54,16 +54,16 @@ suite.addBatch({
       glue.resetListeners();
 
       // remove
-      glue.addListener(callback);
-      glue.addListener({a: 'context'}, callback);
+      glue.addObserver(callback);
+      glue.addObserver({a: 'context'}, callback);
 
       // keep
-      glue.addListener('v1', callback);
-      glue.addListener('v1:ops1', callback);
-      glue.addListener('v1', {a: 'context'}, callback);
-      glue.addListener('v1:ops1', {a: 'context'}, callback);
+      glue.addObserver('v1', callback);
+      glue.addObserver('v1:ops1', callback);
+      glue.addObserver('v1', {a: 'context'}, callback);
+      glue.addObserver('v1:ops1', {a: 'context'}, callback);
 
-      glue.removeListener('');
+      glue.removeObserver('');
       assert.deepEqual(glue.listeners.specific, {});
     },
 
@@ -73,16 +73,16 @@ suite.addBatch({
       glue.resetListeners();
 
       // keep
-      glue.addListener(callback);
-      glue.addListener({a: 'context'}, callback);
+      glue.addObserver(callback);
+      glue.addObserver({a: 'context'}, callback);
 
       // remove
-      glue.addListener('v1', callback);
-      glue.addListener('v1:ops1', callback);
-      glue.addListener('v1', {a: 'context'}, callback);
-      glue.addListener('v1:ops1', {a: 'context'}, callback);
+      glue.addObserver('v1', callback);
+      glue.addObserver('v1:ops1', callback);
+      glue.addObserver('v1', {a: 'context'}, callback);
+      glue.addObserver('v1:ops1', {a: 'context'}, callback);
 
-      glue.removeListener('v1');
+      glue.removeObserver('v1');
       assert.deepEqual(glue.listeners.specific['*'].length, 2);
       assert.deepEqual(glue.listeners.specific['v1'], undefined);
     },
@@ -93,16 +93,16 @@ suite.addBatch({
       glue.resetListeners();
 
       // keep
-      glue.addListener(callback);
-      glue.addListener({a: 'context'}, callback);
-      glue.addListener('v1', callback);
-      glue.addListener('v1', {a: 'context'}, callback);
+      glue.addObserver(callback);
+      glue.addObserver({a: 'context'}, callback);
+      glue.addObserver('v1', callback);
+      glue.addObserver('v1', {a: 'context'}, callback);
 
       // remove
-      glue.addListener('v1:ops1', callback);
-      glue.addListener('v1:ops1', {a: 'context'}, callback);
+      glue.addObserver('v1:ops1', callback);
+      glue.addObserver('v1:ops1', {a: 'context'}, callback);
 
-      glue.removeListener('v1:op1');
+      glue.removeObserver('v1:op1');
       assert.deepEqual(glue.listeners.specific['*'].length, 2);
       assert.deepEqual(glue.listeners.specific['v1'].length, 2);
     },
@@ -114,16 +114,16 @@ suite.addBatch({
       glue.resetListeners();
 
       // keep
-      glue.addListener(callback);
-      glue.addListener('v1:ops1', callback);
-      glue.addListener('v1', callback);
+      glue.addObserver(callback);
+      glue.addObserver('v1:ops1', callback);
+      glue.addObserver('v1', callback);
 
       // remove
-      glue.addListener('v1:ops1', context, callback);
-      glue.addListener(context, callback);
-      glue.addListener('v1', context, callback);
+      glue.addObserver('v1:ops1', context, callback);
+      glue.addObserver(context, callback);
+      glue.addObserver('v1', context, callback);
 
-      glue.removeListener(':ops1', context);
+      glue.removeObserver(':ops1', context);
 
       assert.equal(glue.listeners.specific['*'].length, 1);
       assert.equal(glue.listeners.specific['v1'].length, 2);
@@ -136,16 +136,16 @@ suite.addBatch({
       glue.resetListeners();
 
       // keep
-      glue.addListener(callback);
-      glue.addListener('v1', callback);
-      glue.addListener('v1:ops1', callback);
+      glue.addObserver(callback);
+      glue.addObserver('v1', callback);
+      glue.addObserver('v1:ops1', callback);
 
       // remove
-      glue.addListener(context, callback);
-      glue.addListener('v1', context, callback);
-      glue.addListener('v1:ops1', context, callback);
+      glue.addObserver(context, callback);
+      glue.addObserver('v1', context, callback);
+      glue.addObserver('v1:ops1', context, callback);
 
-      glue.removeListener(':ops1', context);
+      glue.removeObserver(':ops1', context);
 
       assert.equal(glue.listeners.specific['*'].length, 1);
       assert.equal(glue.listeners.specific['v1'].length, 2);
@@ -158,13 +158,13 @@ suite.addBatch({
       glue.resetListeners();
 
       // keep
-      glue.addListener('v1', context, callback);
+      glue.addObserver('v1', context, callback);
 
       // remove
-      glue.addListener('[]', context, callback);
-      glue.addListener('[]:set', context, callback);
+      glue.addObserver('[]', context, callback);
+      glue.addObserver('[]:set', context, callback);
 
-      glue.removeListener('[]:set', context);
+      glue.removeObserver('[]:set', context);
 
       assert.deepEqual(glue.listeners.specific['v1'].length, 1);
       assert.deepEqual(glue.listeners.generic, {});

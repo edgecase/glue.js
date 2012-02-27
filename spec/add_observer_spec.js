@@ -2,7 +2,7 @@ var vows   = require('vows')
 ,   assert = require('assert')
 ,   Glue   = require(__dirname + "/../lib/glue");
 
-var suite  = vows.describe('addListener');
+var suite  = vows.describe('addObserver');
 
 // Assigns a listener for the target object. Listners can be assigned to 
 // a key of the target object, and will be triggered when the value of that
@@ -11,7 +11,7 @@ var suite  = vows.describe('addListener');
 // listener to the any key '*' (see test cases for any key(*)).
 //
 // Usage:
-// glue.addListener([key(s):operation(s)], [context], listener)
+// glue.addObserver([key(s):operation(s)], [context], listener)
 //
 // key(s) (optional):
 //  specifies when the listener function is to be invoked. Multiple keys
@@ -41,7 +41,7 @@ var suite  = vows.describe('addListener');
 // var glue = new Glue ({ arr = [] })
 //     obj  = {v1: ''};
 //
-// glue.addListener('arr:push,remove', obj, function(msg) {
+// glue.addObserver('arr:push,remove', obj, function(msg) {
 //   this.v1 = msg.newValue;
 // });
 //
@@ -56,7 +56,7 @@ suite.addBatch({
     "implicitly assigned to any key": function(glue) {
       var callback = function(){};
       glue.resetListeners();
-      glue.addListener(callback);
+      glue.addObserver(callback);
 
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
@@ -68,7 +68,7 @@ suite.addBatch({
     "assigned explicitly to any key with '*' key": function(glue) {
       var callback = function(){};
       glue.resetListeners();
-      glue.addListener('*', callback);
+      glue.addObserver('*', callback);
 
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
@@ -81,7 +81,7 @@ suite.addBatch({
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener(':filter', callback);
+      glue.addObserver(':filter', callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: ['filter'],
@@ -93,7 +93,7 @@ suite.addBatch({
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener(':set,push', callback);
+      glue.addObserver(':set,push', callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: ['set', 'push'],
@@ -105,7 +105,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = { a: 'context'};
       glue.resetListeners();
 
-      glue.addListener(contextObject, callback);
+      glue.addObserver(contextObject, callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: [],
@@ -117,7 +117,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = { a: 'context'};
       glue.resetListeners();
 
-      glue.addListener('*', contextObject, callback);
+      glue.addObserver('*', contextObject, callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: [],
@@ -130,7 +130,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener(':push', contextObject, callback);
+      glue.addObserver(':push', contextObject, callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: ['push'],
@@ -142,7 +142,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener(':push, set', contextObject, callback);
+      glue.addObserver(':push, set', contextObject, callback);
       assert.deepEqual(glue.listeners.specific['*'], [{
         callback: callback,
         operations: ['push', 'set'],
@@ -154,7 +154,7 @@ suite.addBatch({
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener('v1', callback);
+      glue.addObserver('v1', callback);
       assert.deepEqual(glue.listeners.specific.v1, [{
         context: {},
         operations: [],
@@ -166,7 +166,7 @@ suite.addBatch({
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener('v1:set', callback);
+      glue.addObserver('v1:set', callback);
 
       assert.deepEqual(glue.listeners.specific.v1, [{
         context: {},
@@ -179,7 +179,7 @@ suite.addBatch({
       var callback = function(){};
       glue.resetListeners();
 
-      glue.addListener('v1:set, remove', callback);
+      glue.addObserver('v1:set, remove', callback);
 
       assert.deepEqual(glue.listeners.specific.v1, [{
         context: {},
@@ -192,7 +192,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener('v1', contextObject, callback);
+      glue.addObserver('v1', contextObject, callback);
       assert.deepEqual(glue.listeners.specific.v1, [{
         callback: callback, operations: [], context: contextObject
       }]);
@@ -202,7 +202,7 @@ suite.addBatch({
       var callback = function(){}, contextObject = {};
       glue.resetListeners();
 
-      glue.addListener('v1, v2', contextObject, callback);
+      glue.addObserver('v1, v2', contextObject, callback);
 
       assert.deepEqual(glue.listeners.specific.v1, [{
         callback: callback, operations: [], context: contextObject
@@ -219,8 +219,8 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener('v1', callback1);
-      glue.addListener('v1', callback2);
+      glue.addObserver('v1', callback1);
+      glue.addObserver('v1', callback2);
 
       assert.deepEqual(glue.listeners.specific.v1, [
         { context: {}, operations: [], callback: callback1 },
@@ -236,7 +236,7 @@ suite.addBatch({
       var callback = function(){};
 
       glue.resetListeners();
-      glue.addListener('[]', callback);
+      glue.addObserver('[]', callback);
 
       glue.push(1);
 

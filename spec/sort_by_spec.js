@@ -25,7 +25,7 @@ suite.addBatch({
       var messages = [],
           glue = new Glue(['4elem', '5elem' , '3elem', '1elem' ,'2elem']);
 
-      glue.addListener('[]', function(msg) {
+      glue.addObserver('[]', function(msg) {
         messages.push(msg);
       });
 

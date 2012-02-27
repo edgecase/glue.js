@@ -1,6 +1,6 @@
 # Overview
 `glue.js` is a general purpose hash/array observer for Javascript. It
-gives users the ability to add listeners to object properties, and automatically
+gives users the ability to add observers to object properties, and automatically
 execute them when that property changes.
 
 # Basic Use
@@ -16,7 +16,7 @@ of `Glue`.
 ```javascript
 var glue = new Glue(targetObject);
 
-glue.addListener("*", function() {
+glue.addObserver("*", function() {
   console.log('Target object changed.');
 });
 
@@ -29,7 +29,7 @@ the value of `v1` changed by the `set` operator.
 For more examples, please see the specs directory.
 
 ###Keys
-Keys are a core concept in Glue, for both listeners and operations (ie: set).
+Keys are a core concept in Glue, for both observers and operations (ie: set).
 
 ```javascript
 var target = {
@@ -44,7 +44,7 @@ var glue = new Glue(target);
 ```
 
 ```javascript
-glue.addListener("", function(message) {
+glue.addObserver("", function(message) {
   // callback will be triggered on any modification
   // ex: glue.set("name", "foo");
   // ex: glue.set("contact.email", "foo@edgecase.com");
@@ -52,7 +52,7 @@ glue.addListener("", function(message) {
 ```
 
 ```javascript
-glue.addListener("contact", function(message) {
+glue.addObserver("contact", function(message) {
   // callback will be triggered on any modification to the contact property
   // ex: glue.set("contact", {});
   // ex: glue.set("contact.email", "foo@edgecase.com");
@@ -63,7 +63,7 @@ glue.addListener("contact", function(message) {
 ```
 
 ```javascript
-glue.addListener("contact.email", function(message) {
+glue.addObserver("contact.email", function(message) {
   // callback will be triggered on any modification to the email property of the contact object.
   // ex: glue.set("contact.email", "foo@edgecase.com");
 
@@ -81,13 +81,13 @@ var glue = new Glue(target1);
 ```
 
 ```javascript
-glue.addListener('[2]', function(message) {
+glue.addObserver('[2]', function(message) {
   // callback is executed only when a change occurs to the element at index 2 of the array.
 });
 ```
 
 ```javascript
-glue.addListener('[]', function(message) {
+glue.addObserver('[]', function(message) {
   // callback is executed for every element that changes in the array.
 });
 ```
@@ -123,19 +123,19 @@ new Glue(targetObject);
 
 **targetObject:** the object that will be observed by `Glue`.
 
-##addListener
+##addObserver
 ```javascript
-glue.addListener([key(s):operation(s)], [context], callback);
+glue.addObserver([key(s):operation(s)], [context], callback);
 ```
 
-**key(s) (optional):** specifies the key or index that will be observed by the listener.
+**key(s) (optional):** specifies the key or index that will be observed by the observer.
 
 **operation(s) (optional):** restricts the callback's execution for a particular operation. (push, pop, etc.)
 
 **context (optional):** the context which the callback is to be executed. By default, callbacks are
 executed in the context of the `target` object.
 
-**callback:** the function to be executed when the listener is notified. Callbacks are passed a
+**callback:** the function to be executed when the observer is notified. Callbacks are passed a
 message parameter that contains information about what changed on the `key` being listened to.
 
 ###Examples
@@ -143,27 +143,27 @@ message parameter that contains information about what changed on the `key` bein
 Setting a listen for a key:
 
 ```javascript
-glue.addListener('v1', callback);
+glue.addObserver('v1', callback);
 ```
 
-Setting a listener for multiple keys:
+Setting a observer for multiple keys:
 
 ```javascript
-glue.addListener('v1, v2', callback);
+glue.addObserver('v1, v2', callback);
 ```
 
-Setting a listener for a specific operation:
+Setting a observer for a specific operation:
 
 ```javascript
-glue.addListener('v1:set', function(message) {
+glue.addObserver('v1:set', function(message) {
   // callback
 });
 ```
 
-Setting a listener for multiple operations:
+Setting a observer for multiple operations:
 
 ```javascript
-glue.addListener('v1:set, v2:push, :insert', function(message) {
+glue.addObserver('v1:set, v2:push, :insert', function(message) {
   // callback
 });
 ```
@@ -174,7 +174,7 @@ By default all callbacks are executed in the `context` of the `target` object, b
 ```javascript
 var myContext = { a: ''};
 
-glue.addListener(myContext, function(message) {
+glue.addObserver(myContext, function(message) {
   // "this" in side the callback is myContext
   this.a = 'context';
 });
@@ -184,7 +184,7 @@ When the callback above is executed, `myContext` will have the value `{ a: 'cont
 The context can be used in conjunction with keys and operations as follows:
 
 ```javascript
-glue.addListener('v1:set', context, function(message) {
+glue.addObserver('v1:set', context, function(message) {
   // callback
 });
 ```
@@ -196,7 +196,7 @@ var context = { myWord: 'Oh my' },
     target = { v1: '' },
     glue = new Glue(target);
 
-glue.addListener(context, function(message) {
+glue.addObserver(context, function(message) {
   this.myWord = message.value;
 });
 
@@ -206,7 +206,7 @@ console.log(context); // { myWord: 'Hello' }
 ```
 
 ###Messages
-A message object is passed to the listener callback function.
+A message object is passed to the observer callback function.
 
 ####Basic Messages
 
@@ -216,7 +216,7 @@ var messages = [],
     glue = new Glue(target1);
 
 
-glue.addListener('*', function(msg) {
+glue.addObserver('*', function(msg) {
   console.log(message);
 });
 
@@ -231,14 +231,14 @@ glue.set('foo', 'baz');
 
 ####Array Specific messages
 
-Messages content depend on the type of key is assigned to the listener.
+Messages content depend on the type of key is assigned to the observer.
 
 ```javascript
 var message,
     target1 = { arr: [1, 2, 3, 4, 5] },
     glue = new Glue(target1);
 
-glue.addListener('arr[2]', function(msg) {
+glue.addObserver('arr[2]', function(msg) {
   message = msg;
 });
 
@@ -255,7 +255,7 @@ var message,
   glue = new Glue(target1);
 
 
-glue.addListener('arr[]', function(msg) {
+glue.addObserver('arr[]', function(msg) {
   message = msg;
 });
 
@@ -272,7 +272,7 @@ var messages = [],
     glue = new Glue(target1);
 
 
-glue.addListener('*', function(msg) {
+glue.addObserver('*', function(msg) {
   messages.push(msg);
 });
 
@@ -290,7 +290,7 @@ var messages = [],
     target1 = [1, 2, 3, 4, 5],
     glue = new Glue(target1);
 
-glue.addListener('[]', function(msg) {
+glue.addObserver('[]', function(msg) {
   messages.push(msg);
 });
 
@@ -311,9 +311,9 @@ console.log(messages)
 // --------------------------------------------------------------------------
 ```
 
-##removeListener
+##removeObserver
 ```javascript
-glue.addListener([key(s):operation(s))], [context]);
+glue.addObserver([key(s):operation(s))], [context]);
 ```
 
 **key(s) (optional)**: the key to be removed
@@ -325,22 +325,22 @@ glue.addListener([key(s):operation(s))], [context]);
 Example
 
 ```javascript
-glue.removeListener('key');
-glue.removeListener('key1, key2');
-glue.removeListener('key1, key2:operation');
+glue.removeObserver('key');
+glue.removeObserver('key1, key2');
+glue.removeObserver('key1, key2:operation');
 
-glue.removeListener(':operation');
-glue.removeListener(':operation1, operation2');
+glue.removeObserver(':operation');
+glue.removeObserver(':operation1, operation2');
 
-glue.removeListener('key:operation');
-glue.removeListener('key:operation, operation2');
-glue.removeListener('key1, key2:operation, operation2');
+glue.removeObserver('key:operation');
+glue.removeObserver('key:operation, operation2');
+glue.removeObserver('key1, key2:operation, operation2');
 
-glue.removeListener('key', context);
-glue.removeListener(':operation', context);
-glue.removeListener('key1, key2:operation', context);
-glue.removeListener('key:operation1, operation2', context);
-glue.removeListener('key1, key2:operation, operation2', context);
+glue.removeObserver('key', context);
+glue.removeObserver(':operation', context);
+glue.removeObserver('key1, key2:operation', context);
+glue.removeObserver('key:operation1, operation2', context);
+glue.removeObserver('key1, key2:operation, operation2', context);
 ```
 
 ##set

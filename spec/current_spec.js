@@ -16,11 +16,11 @@
 // 
 //       glue.resetListeners();
 // 
-//       glue.addListener(function(msg) {
+//       glue.addObserver(function(msg) {
 //         message1 = msg;
 //       });
 // 
-//       glue.addListener(function(msg) {
+//       glue.addObserver(function(msg) {
 //         message2 = msg;
 //       });
 // 

@@ -38,7 +38,7 @@ suite.addBatch({
     "notifies with operation and oldValue": function(topic) {
       var message;
 
-      topic.addListener(function(msg) {
+      topic.addObserver(function(msg) {
         message = msg;
       });
 

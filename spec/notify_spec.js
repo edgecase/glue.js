@@ -32,11 +32,11 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener(function(msg) {
+      glue.addObserver(function(msg) {
         message1 = msg;
       });
 
-      glue.addListener(function(msg) {
+      glue.addObserver(function(msg) {
         message2 = msg;
       });
 
@@ -59,7 +59,7 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener('v1', function(msg) {
+      glue.addObserver('v1', function(msg) {
         message = msg;
       });
 
@@ -78,11 +78,11 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener('v1:set', function(msg) {
+      glue.addObserver('v1:set', function(msg) {
         message1 = msg;
       });
 
-      glue.addListener('v1:push', function(msg) {
+      glue.addObserver('v1:push', function(msg) {
         message2 = msg;
       });
 
@@ -102,7 +102,7 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener('[]', function(msg) {
+      glue.addObserver('[]', function(msg) {
         message = msg;
       });
 
@@ -121,7 +121,7 @@ suite.addBatch({
 
       glue.resetListeners();
 
-      glue.addListener('[0].v1.arr[]', function(msg) {
+      glue.addObserver('[0].v1.arr[]', function(msg) {
         messages.push(msg);
       });
 

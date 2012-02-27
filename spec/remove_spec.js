@@ -24,7 +24,7 @@ suite.addBatch({
       var message,
           topic = new Glue({v1: 'value'});
 
-      topic.addListener('v1', function(msg) {
+      topic.addObserver('v1', function(msg) {
         message = msg;
       });
 
@@ -65,7 +65,7 @@ suite.addBatch({
 
       topic.resetListeners();
 
-      topic.addListener("arr[0]", function(msg) {
+      topic.addObserver("arr[0]", function(msg) {
         message = msg;
       });
 

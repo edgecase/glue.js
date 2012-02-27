@@ -26,7 +26,7 @@ suite.addBatch({
       var messages = [],
           glue = new Glue([1, 2, 3, 4]);
 
-      glue.addListener('[]', function(msg) {
+      glue.addObserver('[]', function(msg) {
         messages.push(msg);
       });
 
@@ -44,7 +44,7 @@ suite.addBatch({
       var messages = [],
           glue = new Glue([1, 2, 3, 4]);
 
-      glue.addListener('[]', function(msg) {
+      glue.addObserver('[]', function(msg) {
         messages.push(msg);
       });
 
@@ -64,7 +64,7 @@ suite.addBatch({
       var messages = [],
           glue = new Glue([1, 2, 3, 4]);
 
-      glue.addListener('[]', function(msg) {
+      glue.addObserver('[]', function(msg) {
         messages.push(msg);
       });
 
