@@ -1,7 +1,6 @@
 # Overview
-`glue.js` is a general purpose hash/array observer for Javascript. It
-gives users the ability to add observers to object properties, and automatically
-execute them when that property changes.
+`glue.js` is a key-value observing library for Javascript. `glue.js` supports both
+assigned and computed properties, nested in an abitrarily deep object graph.
 
 # Basic Use
 Given the following object:
